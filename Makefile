@@ -38,7 +38,6 @@ OBJS := \
 ./utils/mat2img.o \
 ./utils/median.o 
 
-
 .PHONY: all clean
 
 tldc: $(OBJS)
@@ -56,7 +55,7 @@ clean:
 %.o: %.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
-	$(CC) $(CFLAGS) $(INCLUDES) $(OPTS) -MF"%.d" -o"$@" "$<"
+	$(CC) $(CFLAGS) $(INCLUDES) $(OPTS) -MF"$*.d" -o"$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
