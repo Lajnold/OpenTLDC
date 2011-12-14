@@ -56,9 +56,13 @@ void tldExample(TldStruct* opt, Config& cfg) {
 		t = (double)getTickCount();
 		tldProcessFrame(tld, i);
 		t = ((double)getTickCount() - t)/getTickFrequency();
+
 		if (!cfg.nodisplay)
 			tldDisplay(1, i, tld, t);
 
+		std::cout << "BB - xmin: " << tld.currentBB(0) << " ymin: "
+				<< tld.currentBB(1) << " xmax: " << tld.currentBB(2) << " ymax: "
+				<< tld.currentBB(3) << std::endl;
 
 		i++;
 

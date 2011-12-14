@@ -137,7 +137,4 @@ void tldProcessFrame(TldStruct& tld, unsigned long i) {
 	//LEARNING
 	if (tld.control.update_detector && tld.currentValid == 1)
 		tldLearning(tld, i);
-	std::cout << "BB - xmin: " << tld.currentBB(0) << " ymin: "
-			<< tld.currentBB(1) << " xmax: " << tld.currentBB(2) << " ymax: "
-			<< tld.currentBB(3) << std::endl;
 }
