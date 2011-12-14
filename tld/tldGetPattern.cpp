@@ -53,7 +53,7 @@ Eigen::Matrix<double, (PATCHSIZE * PATCHSIZE), Eigen::Dynamic> tldGetPattern(
 
 		// sample patch
 		Eigen::Vector4d tmpbb = bb.col(i);
-		IplImage* patch = img_patch(img.input, tmpbb);
+		CvImage patch = img_patch(img.input, tmpbb);
 
 		// flip if needed
 		if (flip) {
@@ -62,7 +62,6 @@ Eigen::Matrix<double, (PATCHSIZE * PATCHSIZE), Eigen::Dynamic> tldGetPattern(
 
 		// normalize size to 'patchsize' and nomalize intensities to ZMUV
 		pattern.col(i) = tldPatch2Pattern(patch, patchsize);
-		cvReleaseImage(&patch);
 	}
 
 	return pattern;

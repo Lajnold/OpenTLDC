@@ -128,7 +128,7 @@ inline Eigen::Vector4d bb_rescalerel(Eigen::Vector4d const & bb,
 /**
  * The function draws a rectangle with coordinates given by a vector and a defined color.
  */
-inline void bb_draw(IplImage* img, Eigen::Vector4d const & bb, Scalar color,
+inline void bb_draw(CvImage img, Eigen::Vector4d const & bb, Scalar color,
 		unsigned int linewidth) {
 	if (bb.isZero()) {
 		return;
@@ -145,7 +145,7 @@ inline void bb_draw(IplImage* img, Eigen::Vector4d const & bb, Scalar color,
 /**
  * If no drawing color is set. It will be set to yellow.
  */
-inline void bb_draw_add_color(IplImage* img, Eigen::Vector4d const & bb) {
+inline void bb_draw_add_color(CvImage img, Eigen::Vector4d const & bb) {
 	if (bb.isZero()) {
 		return;
 	} else {

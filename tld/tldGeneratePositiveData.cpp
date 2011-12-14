@@ -118,18 +118,16 @@ Eigen::Vector4d tldGeneratePositiveData(TldStruct& tld,
 			double randomize = uniform();
 
 			// warp image randomly
-			IplImage* patch_blur = img_patch(img.blur, bbH, randomize, p_par);
+			CvImage patch_blur = img_patch(img.blur, bbH, randomize, p_par);
 
 			// include in in image
 			for (unsigned int y = bbH(1); y <= bbH(3); y++)
 				for (unsigned int x = bbH(0); x <= bbH(2); x++) {
-					((uchar*) (im1.blur->imageData + im1.blur->widthStep * (y)))[x]
-							= ((uchar*) (patch_blur->imageData
-									+ patch_blur->widthStep * (y - int(bbH(1)))))[x
+					((uchar*) (im1.blur.data() + im1.blur.step() * (y)))[x]
+							= ((uchar*) (patch_blur.data()
+									+ patch_blur.step() * (y - int(bbH(1)))))[x
 									- int(bbH(0))];
 				}
-
-			cvReleaseImage(&patch_blur);
 		}
 
 		// Measures on blured image
@@ -142,8 +140,6 @@ Eigen::Vector4d tldGeneratePositiveData(TldStruct& tld,
 
 	}
 
-	cvReleaseImage(&(im1.input));
-	cvReleaseImage(&(im1.blur));
 	tld.var = variance(pEx, pEx.rows()) / 2;
 	return bbP0;
 

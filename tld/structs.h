@@ -33,18 +33,19 @@
 #define DIMY 480
 
 #include <opencv/cv.h>
+#include <opencv/cvaux.h>
 #include <opencv/highgui.h>
 
 #include <Eigen/Dense>
 #include <Eigen/Core>
 
+#include "../img/ImageSource.h"
+
 // Initial Configuration
 typedef struct {
 	Eigen::Vector4d init;
-	int camindex;
 	unsigned int nodisplay;
-	int startFrame;
-	std::string videopath;
+        ImageSource *imgsource;
 } Config;
 
 // Plot
@@ -62,8 +63,8 @@ typedef struct {
 
 // Blured image and input image (grayscale)
 typedef struct {
-	IplImage* blur;
-	IplImage* input;
+	CvImage blur;
+	CvImage input;
 } ImgType;
 
 typedef struct {
@@ -158,7 +159,7 @@ typedef struct {
 	double size;
 
 	ImgSize imgsize;
-	IplImage* target;
+	CvImage target;
 
 	int npex;
 	int nnex;
@@ -170,7 +171,7 @@ typedef struct {
 
 	double var;
 
-	IplImage* handle;
+	CvImage handle;
 } TldStruct;
 
 #endif

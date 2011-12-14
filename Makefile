@@ -12,8 +12,8 @@ OBJS := \
 ./bbox/bb_points.o \
 ./bbox/bb_predict.o \
 ./bbox/bb_scan.o \
+./img/ImageSource.o \
 ./img/img_blur.o \
-./img/img_get.o \
 ./img/img_patch.o \
 ./mex/bb_overlap.o \
 ./mex/distance.o \

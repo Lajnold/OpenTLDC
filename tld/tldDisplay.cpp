@@ -41,14 +41,14 @@
  */
 void tldDisplay(int i, unsigned long index, TldStruct& tld, double fps) {
 
-	IplImage* inputClone = cvCloneImage(tld.currentImg.input);
+	CvImage inputClone = tld.currentImg.input.clone();
 
 	if (i == 0) {
 
 		// draw bounding box
 		bb_draw_add_color(inputClone, tld.currentBB);
 
-		tld.handle = cvCreateImage(cvGetSize(inputClone), img_get_colored()->depth, 3);
+		tld.handle = CvImage(inputClone.size(), tld.cfg->imgsource->getImage().depth(), 3);
 
 		cvCvtColor(inputClone, tld.handle, CV_GRAY2BGR);
 
@@ -61,11 +61,11 @@ void tldDisplay(int i, unsigned long index, TldStruct& tld, double fps) {
 
 		// show positive patches
 		if (tld.plot->pex == 1)
-			inputClone = embedPex(inputClone, tld);
+			embedPex(inputClone, tld);
 
 		// show negative patches
 		if (tld.plot->nex == 1)
-			inputClone = embedNex(inputClone, tld);
+			embedNex(inputClone, tld);
 
 		CvFont font;
 		fps = 1 / fps;
@@ -74,7 +74,7 @@ void tldDisplay(int i, unsigned long index, TldStruct& tld, double fps) {
 		cvInitFont(&font, CV_FONT_HERSHEY_SIMPLEX, 1.0, 1.0, 0, 1, CV_AA);
 
 
-		tld.handle = cvCreateImage(cvGetSize(inputClone), img_get_colored()->depth, 3);
+		tld.handle = CvImage(inputClone.size(), tld.cfg->imgsource->getImage().depth(), 3);
 		cvCvtColor(inputClone, tld.handle, CV_GRAY2BGR); // colored output image
 
 		// put fps
@@ -91,21 +91,18 @@ void tldDisplay(int i, unsigned long index, TldStruct& tld, double fps) {
 			Eigen::Vector4d bb = bb_rescalerel(tld.currentBB,
 					vecin);
 
-			IplImage* patch = img_patch(tld.handle, bb);
-			IplImage* dest = cvCreateImage(cvSize((int) size, (int) size),
-					patch->depth, patch->nChannels);
+			CvImage patch = img_patch(tld.handle, bb);
+			CvImage dest = CvImage(cvSize((int) size, (int) size),
+					patch.depth(), patch.channels());
 
 			cvResize(patch, dest);
 
 			for (unsigned int y = 0; y < size; y++)
 				for (unsigned int x = 0; x < size; x++) {
-					((uchar*) (tld.handle->imageData + tld.handle->widthStep
-							* (y)))[x] = ((uchar*) (dest->imageData
-							+ dest->widthStep * (y)))[x];
+					((uchar*) (tld.handle.data() + tld.handle.step()
+							* (y)))[x] = ((uchar*) (dest.data()
+							+ dest.step() * (y)))[x];
 				}
-
-			cvReleaseImage(&patch);
-			cvReleaseImage(&dest);
 		}
 
 		// Replace
@@ -118,27 +115,25 @@ void tldDisplay(int i, unsigned long index, TldStruct& tld, double fps) {
 			bb(3) = floor(tld.currentBB(3) + 0.5);
 
 			Eigen::Vector2i imsize;
-			imsize << tld.currentImg.input->width, tld.currentImg.input->height;
+			imsize << tld.currentImg.input.width(), tld.currentImg.input.height();
 
 			if (bb_isin(bb, imsize)) {
 				unsigned int width = (int) (bb(2) - bb(0)) + 1;
 				unsigned int height = (int) (bb(3) - bb(1)) + 1;
 
-				IplImage* patch = cvCreateImage(cvSize(width, height),
-						tld.target->depth, tld.target->nChannels);
+				CvImage patch = CvImage(cvSize(width, height),
+						tld.target.depth(), tld.target.channels());
 
 				cvResize(tld.target, patch);
 
 				for (unsigned int y = bb(1); y <= bb(3); y++)
 					for (unsigned int x = bb(0); x <= bb(2); x++) {
-						((uchar*) (tld.handle->imageData
-								+ tld.handle->widthStep * (y)))[x]
-								= ((uchar*) (patch->imageData
-										+ patch->widthStep * (y - int(bb(1)))))[x
+						((uchar*) (tld.handle.data()
+								+ tld.handle.step() * (y)))[x]
+								= ((uchar*) (patch.data()
+										+ patch.step() * (y - int(bb(1)))))[x
 										- int(bb(0))];
 					}
-
-				cvReleaseImage(&patch);
 			}
 		}
 
@@ -170,19 +165,15 @@ void tldDisplay(int i, unsigned long index, TldStruct& tld, double fps) {
 			std::cout << "key pressed" << std::endl;
 
 	}
-
-	cvReleaseImage(&inputClone);
-
 }
 
 /**
- * Puts all positive patches on IplImage.
+ * Puts all positive patches on image.
  *
  * @param img output image
  * @param tld learned structures
- * @return output image
  */
-IplImage* embedPex(IplImage* img, TldStruct& tld) {
+void embedPex(CvImage img, TldStruct& tld) {
 
 
 	double rescale = tld.plot->patch_rescale;
@@ -206,24 +197,20 @@ IplImage* embedPex(IplImage* img, TldStruct& tld) {
 
 	// include in output image
 	for (int y = 0; y < pH; y++)
-		for (int x = img->width - pW; x < img->width; x++) {
-			((uchar*) (img->imageData + img->widthStep * (y)))[x] = 255 * pex(
-					y, x - (img->width - pW));
+		for (int x = img.width() - pW; x < img.width(); x++) {
+			((uchar*) (img.data() + img.step() * (y)))[x] = 255 * pex(
+					y, x - (img.width() - pW));
 
 		}
-
-	return img;
-
 }
 
 /**
- * Puts all negative patches on IplImage.
+ * Puts all negative patches on image.
  *
  * @param img output image
  * @param tld learned structures
- * @return output image
  */
-IplImage* embedNex(IplImage* img, TldStruct& tld) {
+void embedNex(CvImage img, TldStruct& tld) {
 
 	double rescale = tld.plot->patch_rescale;
 
@@ -247,9 +234,7 @@ IplImage* embedNex(IplImage* img, TldStruct& tld) {
 	// include in output image
 	for (int y = 0; y < pH; y++)
 		for (int x = 0; x < pW; x++) {
-			((uchar*) (img->imageData + img->widthStep * (y)))[x]
+			((uchar*) (img.data() + img.step() * (y)))[x]
 					= 255 * nex(y, x);
 		}
-	return img;
-
 }

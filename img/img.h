@@ -24,24 +24,18 @@
 #ifndef IMG_H_
 #define IMG_H_
 
-#include <math.h>
+#include <Eigen/Core>
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
 
-#include "../tld/tld.h"
+#include "../tld/structs.h"
 
-IplImage* img_patch(IplImage* img, Eigen::Vector4d const & bb, double randomize,
+CvImage img_patch(CvImage img, Eigen::Vector4d const & bb, double randomize,
 		p_par& p_par);
 
-IplImage* img_patch(IplImage* img, Eigen::Vector4d const & bb);
+CvImage img_patch(CvImage img, Eigen::Vector4d const & bb);
 
-IplImage* img_blur(IplImage* image, int sigma);
-IplImage* img_blur(IplImage* image);
-/*Initialize*/
-void img_init(Config& cfg);
-/*Get next image (grayscale)*/
-IplImage* img_get();
-/*Get next image (color)*/
-IplImage* img_get_colored();
+CvImage img_blur(CvImage image, int sigma);
+CvImage img_blur(CvImage image);
 
 #endif /* IMG_H_ */

@@ -22,23 +22,21 @@
  */
 
 #include "tld.h"
-/* Converts an IplImage to Eigen Matrix */
-Eigen::Matrix<double, PATCHSIZE * PATCHSIZE, 1> tldPatch2Pattern(IplImage* patch,
+/* Converts an image to Eigen Matrix */
+Eigen::Matrix<double, PATCHSIZE * PATCHSIZE, 1> tldPatch2Pattern(CvImage patch,
 		Patchsize const& patchsize) {
 
-	IplImage* dest = cvCreateImage(
-			cvSize((int) patchsize.x, (int) patchsize.y), patch->depth,
-			patch->nChannels);
+	CvImage dest = CvImage(
+			cvSize((int) patchsize.x, (int) patchsize.y), patch.depth(),
+			patch.channels());
 
 	//bilinear' is faster
 	cvResize(patch, dest);
 	Eigen::MatrixXd pattern(patchsize.x * patchsize.y, 1);
-	for (int x = 0; x < dest->width; x++)
-		for (int y = 0; y < dest->height; y++)
-			pattern(x*patchsize.x + y, 0) = double(((uchar*) (dest->imageData + dest->widthStep
+	for (int x = 0; x < dest.width(); x++)
+		for (int y = 0; y < dest.height(); y++)
+			pattern(x*patchsize.x + y, 0) = double(((uchar*) (dest.data() + dest.step()
 					* (y)))[x]);
-
-	cvReleaseImage(&dest);
 
 	// calculate column-wise mean
 	Eigen::RowVectorXd mean(patchsize.x);

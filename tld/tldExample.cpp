@@ -53,8 +53,6 @@ void tldExample(TldStruct* opt, Config& cfg) {
 
 	while (i < 2500) {
 
-		cvReleaseImage(&(tld.handle));
-
 		t = (double)getTickCount();
 		tldProcessFrame(tld, i);
 		t = ((double)getTickCount() - t)/getTickFrequency();

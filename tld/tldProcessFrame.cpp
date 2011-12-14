@@ -33,9 +33,11 @@ void tldProcessFrame(TldStruct& tld, unsigned long i) {
 	double t = (double) getTickCount();
 	tld.prevImg = tld.currentImg;
 
+	tld.cfg->imgsource->nextImage();
+
 	//Input image
 	ImgType im0;
-	im0.input = img_get();
+	im0.input = tld.cfg->imgsource->getGrayImage();
 
 	//Blurred image
 	im0.blur = img_blur(im0.input);
@@ -147,6 +149,4 @@ void tldProcessFrame(TldStruct& tld, unsigned long i) {
 	std::cout << "BB - xmin: " << tld.currentBB(0) << " ymin: "
 			<< tld.currentBB(1) << " xmax: " << tld.currentBB(2) << " ymax: "
 			<< tld.currentBB(3) << std::endl;
-	cvReleaseImage(&(tld.prevImg.input));
-	cvReleaseImage(&(tld.prevImg.blur));
 }

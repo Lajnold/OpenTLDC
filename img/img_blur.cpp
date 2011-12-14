@@ -23,17 +23,17 @@
 #include "img.h"
 
 //apply a gaussian filter to the image
-IplImage* img_blur(IplImage* image, int sigma){
+CvImage img_blur(CvImage image, int sigma){
 	int csize = 6* sigma;
-	IplImage* out = cvCreateImage(cvGetSize(image), 8, 1);
+	CvImage out = CvImage(image.size(), 8, 1);
 	cvSmooth(image, out, CV_GAUSSIAN, csize, csize);
 	return out;
 }
 
 //apply a gaussian filter to the image
-IplImage* img_blur(IplImage* image){
+CvImage img_blur(CvImage image){
 	int csize = 7;
-	IplImage* out = cvCreateImage(cvGetSize(image), 8, 1);
+	CvImage out = CvImage(image.size(), 8, 1);
 	cvSmooth(image, out, CV_GAUSSIAN, csize, csize);
 	return out;
 }

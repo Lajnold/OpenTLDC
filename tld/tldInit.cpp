@@ -55,11 +55,10 @@ void tldInit(TldStruct& tld) {
 
 	ImgType im0;
 
-	img_init(*(tld.cfg));
+	tld.cfg->imgsource->nextImage();
+	im0.input = tld.cfg->imgsource->getGrayImage();
 
-	im0.input = img_get();
-
-	im0.blur = cvCloneImage(im0.input);
+	im0.blur = im0.input.clone();
 	im0.blur = img_blur(im0.blur);
 
 	// allocate structures

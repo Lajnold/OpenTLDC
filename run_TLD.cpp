@@ -21,7 +21,10 @@
  *
  */
 
+#include <cassert>
+
 #include "tld/tld.h"
+
 TldStruct opt;
 Plot plot;
 Model model;
@@ -34,6 +37,7 @@ int main(int argc, char* argv[]) {
 	Eigen::Vector4d initBB;
 	initBB << -1, -1, -1, -1;
 	unsigned int nodisplay = 0;
+	CvCapture *captureSource;
 
 
 	for (int i = 1; i < argc; ++i) {
@@ -86,11 +90,24 @@ int main(int argc, char* argv[]) {
 			== -1)
 		exit(0);
 
-	cfg.camindex = camindex;
 	cfg.init = initBB;
-	cfg.videopath = videopath;
 	cfg.nodisplay = nodisplay;
-	cfg.startFrame = startFrame;
+	//cfg.startFrame = startFrame;
+
+	if(camindex >= 0)
+		captureSource = cvCaptureFromCAM(camindex);
+	else if(!videopath.empty())
+		captureSource = cvCaptureFromAVI(videopath.c_str());
+	else
+		assert(false && "No image source.");
+
+	cfg.imgsource = new CvCaptureImageSource(captureSource);
+
+	for(int i = 0; i < startFrame; i++) {
+		// Ignore all frames up to startFrame.
+		if(!cfg.imgsource->nextImage())
+			exit(0); // Ran out of images.
+	}
 
 	opt.plot = &plot;
 	opt.plot->save = 0;

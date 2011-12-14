@@ -26,66 +26,61 @@
 #include "../bbox/bbox.h"
 #include "../mex/mex.h"
 
-IplImage* img_patch(IplImage* img, Eigen::Vector4d const & bb, double randomize,
+CvImage img_patch(CvImage img, Eigen::Vector4d const & bb, double randomize,
 		p_par& p_par) {
+	if (randomize <= 0)
+		return CvImage();
 
-	if (randomize > 0) {
+	unsigned int NOISE = p_par.noise;
+	unsigned int ANGLE = p_par.angle;
+	double SCALE = p_par.scale;
+	double SHIFT = p_par.shift;
 
-		unsigned int NOISE = p_par.noise;
-		unsigned int ANGLE = p_par.angle;
-		double SCALE = p_par.scale;
-		double SHIFT = p_par.shift;
+	Eigen::Vector2d cp;
+	cp = bb_center(bb);
+	Eigen::Matrix3d Sh1;
+	Sh1 << 1, 0, -(cp(0) - 1), 0, 1, -(cp(1) - 1), 0, 0, 1;
 
-		Eigen::Vector2d cp;
-		cp = bb_center(bb);
-		Eigen::Matrix3d Sh1;
-		Sh1 << 1, 0, -(cp(0) - 1), 0, 1, -(cp(1) - 1), 0, 0, 1;
+	double sca = 1 - SCALE * (uniform() - 0.5);
+	Eigen::Matrix3d Sca;
+	Sca << sca, 0, 0, 0, sca, 0, 0, 0, 1;
 
-		double sca = 1 - SCALE * (uniform() - 0.5);
-		Eigen::Matrix3d Sca;
-		Sca << sca, 0, 0, 0, sca, 0, 0, 0, 1;
+	double ang = 2 * PI / 360 * ANGLE * (uniform() - 0.5);
+	double ca = cos(ang);
+	double sa = sin(ang);
 
-		double ang = 2 * PI / 360 * ANGLE * (uniform() - 0.5);
-		double ca = cos(ang);
-		double sa = sin(ang);
+	Eigen::Matrix3d Ang;
+	Ang << ca, -sa, 0, sa, ca, 0, 0, 0, 1;
 
-		Eigen::Matrix3d Ang;
-		Ang << ca, -sa, 0, sa, ca, 0, 0, 0, 1;
+	double shR = SHIFT * bb_height(bb) * (uniform() - 0.5);
+	double shC = SHIFT * bb_width(bb) * (uniform() - 0.5);
+	Eigen::Matrix3d Sh2;
+	Sh2 << 1, 0, shC, 0, 1, shR, 0, 0, 1;
 
-		double shR = SHIFT * bb_height(bb) * (uniform() - 0.5);
-		double shC = SHIFT * bb_width(bb) * (uniform() - 0.5);
-		Eigen::Matrix3d Sh2;
-		Sh2 << 1, 0, shC, 0, 1, shR, 0, 0, 1;
+	double bbW = bb_width(bb) - 1;
+	double bbH = bb_height(bb) - 1;
+	Eigen::Vector4d box;
+	box << -bbW / 2, bbW / 2, -bbH / 2, bbH / 2;
+	//
+	//	    H     = Sh2*Ang*Sca*Sh1;
+	Eigen::Matrix3d H;
+	H = Sh2 * Ang * Sca * Sh1;
+	//	    bbsize = bb_size(bb);
+	BBOXSIZE bbsize = bb_size(bb);
+	CvImage patch = warp(img, H.inverse(), box);
+	//	    patch = uint8(warp(img,inv(H),box) + NOISE*randn(bbsize(1),bbsize(2)));
+	Eigen::MatrixXd noisy = Eigen::MatrixXd::Random(bbsize.height, bbsize.width);
+	noisy = noisy.normalized() * NOISE;
 
-		double bbW = bb_width(bb) - 1;
-		double bbH = bb_height(bb) - 1;
-		Eigen::Vector4d box;
-		box << -bbW / 2, bbW / 2, -bbH / 2, bbH / 2;
-		//
-		//	    H     = Sh2*Ang*Sca*Sh1;
-		Eigen::Matrix3d H;
-		H = Sh2 * Ang * Sca * Sh1;
-		//	    bbsize = bb_size(bb);
-		BBOXSIZE bbsize = bb_size(bb);
-		IplImage* patch;
-		//	    patch = uint8(warp(img,inv(H),box) + NOISE*randn(bbsize(1),bbsize(2)));
-		patch = warp(img, H.inverse(), box);
-		Eigen::MatrixXd noisy = Eigen::MatrixXd::Random(bbsize.height, bbsize.width);
-		noisy = noisy.normalized() * NOISE;
+	for (int y = 0; y < patch.height(); y++)
+		for (int x = 0; x < patch.width(); x++)
+			((uchar*) (patch.data() + patch.step() * (y)))[x]
+					+= noisy(y, x);
 
-		for (int y = 0; y < patch->height; y++)
-			for (int x = 0; x < patch->width; x++)
-				((uchar*) (patch->imageData + patch->widthStep * (y)))[x]
-						+= noisy(y, x);
-
-		return patch;
-
-	} else
-		return 0;
-
+	return patch;
 }
 
-IplImage* img_patch(IplImage* img, Eigen::Vector4d const & bb) {
+CvImage img_patch(CvImage img, Eigen::Vector4d const & bb) {
 
 	Eigen::Vector4d rounded;
 	rounded(0) = floor(bb(0) + 0.5);
@@ -96,19 +91,18 @@ IplImage* img_patch(IplImage* img, Eigen::Vector4d const & bb) {
 	//	 % All coordinates are integers
 	//	    if sum(round(bb)-bb)==0
 	if ((rounded - bb).sum() == 0) {
-		unsigned int L = std::min(std::max(0, int(bb(0))), img->width);
-		unsigned int T = std::min(std::max(0, int(bb(1))), img->height);
-		unsigned int R = std::min(img->width - 1, int(bb(2)));
-		unsigned int B = std::min(img->height - 1, int(bb(3)));
-		IplImage* patch = cvCreateImage(cvSize((int) (R - L + 1), (int) (B - T + 1)),
-				IPL_DEPTH_8U, 1);
+		unsigned int L = std::min(std::max(0, int(bb(0))), img.width());
+		unsigned int T = std::min(std::max(0, int(bb(1))), img.height());
+		unsigned int R = std::min(img.width() - 1, int(bb(2)));
+		unsigned int B = std::min(img.height() - 1, int(bb(3)));
+		CvImage patch = CvImage(cvSize((int) (R - L + 1), (int) (B - T + 1)), IPL_DEPTH_8U, 1);
 
 		//	        patch = img(T:B,L:R);
 		for (unsigned int y = T; y <= B; y++)
 			for (unsigned int x = L; x <= R; x++)
-				((uchar*) (patch->imageData + patch->widthStep * (y - T)))[x
+				((uchar*) (patch.data() + patch.step() * (y - T)))[x
 						- L]
-						= ((uchar*) (img->imageData + img->widthStep * (y)))[x];
+						= ((uchar*) (img.data() + img.step() * (y)))[x];
 
 		return patch;
 	} else {
@@ -130,7 +124,7 @@ IplImage* img_patch(IplImage* img, Eigen::Vector4d const & bb) {
 		double bbH = bb(3) - bb(1);
 		//	        if bbW <= 0 || bbH <= 0
 		if (bbW < 0 || bbH < 0)
-			return 0;
+			return CvImage();
 		//	            patch = [];
 		//	            return;
 		//	        end
@@ -142,7 +136,7 @@ IplImage* img_patch(IplImage* img, Eigen::Vector4d const & bb) {
 		// We always use one channel in color space
 		//	            patch = warp(img,inv(H),box);
 
-		IplImage* patch = warp(img, H.inverse(), box);
+		CvImage patch = warp(img, H.inverse(), box);
 		return patch;
 
 	}

@@ -83,9 +83,9 @@ void tldSplitNegativeData(
 				Eigen::Matrix<double, NTREES, Eigen::Dynamic>& spnX,
 				Eigen::Matrix<double, PATCHSIZE * PATCHSIZE, Eigen::Dynamic>& spnEx);
 
-/* Converts an IplImage to Eigen Matrix */
+/* Converts an image to Eigen Matrix */
 Eigen::Matrix<double, PATCHSIZE * PATCHSIZE, 1> tldPatch2Pattern(
-		IplImage* patch, Patchsize const& patchsize);
+		CvImage patch, Patchsize const& patchsize);
 
 /* Trains nearest neighbor */
 void tldTrainNN(
@@ -98,10 +98,10 @@ Eigen::Matrix<double, 3, Eigen::Dynamic> tldNN(Eigen::Matrix<double, PATCHSIZE
 		* PATCHSIZE, Eigen::Dynamic> const & nEx2, TldStruct& tld);
 
 /* Shows positive examples */
-IplImage* embedPex(IplImage* img, TldStruct& tld);
+void embedPex(CvImage img, TldStruct& tld);
 
 /* Shows negative examples */
-IplImage* embedNex(IplImage* img, TldStruct& tld);
+void embedNex(CvImage img, TldStruct& tld);
 
 /* Learns detected pattern */
 void tldLearning(TldStruct& tld, unsigned long I);
