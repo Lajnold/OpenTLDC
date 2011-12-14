@@ -30,7 +30,6 @@
 
 void tldProcessFrame(TldStruct& tld, unsigned long i) {
 
-	double t = (double) getTickCount();
 	tld.prevImg = tld.currentImg;
 
 	tld.cfg->imgsource->nextImage();
@@ -57,17 +56,13 @@ void tldProcessFrame(TldStruct& tld, unsigned long i) {
 
 	//TRACKER
 	//rame-to-frame tracking (MedianFlow)
-	t = (double) getTickCount();
 	Eigen::VectorXd tldTrack = tldTracking(tld, tld.prevBB, i - 1, i);
-	t = ((double) getTickCount() - t) / getTickFrequency();
 
 	//DETECTOR
 	//detect appearances by cascaded detector (variance filter -> ensemble classifier -> nearest neighbor)
 	Eigen::Matrix<double, 4, 20> dBB;
 	int nD = 0;
-	t = (double) getTickCount();
 	Eigen::Matrix<double, 20, 1> detConf = tldDetection(tld, i, dBB, nD);
-	t = ((double) getTickCount() - t) / getTickFrequency();
 
 	//INTEGRATOR
 	//Tracker defined?
@@ -80,7 +75,6 @@ void tldProcessFrame(TldStruct& tld, unsigned long i) {
 	if (isnan(dBB(0, 0))) {
 		DT = 0;
 	}
-	t = (double) getTickCount();
 	if (TR) {
 		//copy tracker's result
 		tld.size = 1;
@@ -139,13 +133,10 @@ void tldProcessFrame(TldStruct& tld, unsigned long i) {
 			}
 		}
 	}
-	t = ((double) getTickCount() - t) / getTickFrequency();
 
 	//LEARNING
-	t = (double) getTickCount();
 	if (tld.control.update_detector && tld.currentValid == 1)
 		tldLearning(tld, i);
-	t = ((double) getTickCount() - t) / getTickFrequency();
 	std::cout << "BB - xmin: " << tld.currentBB(0) << " ymin: "
 			<< tld.currentBB(1) << " xmax: " << tld.currentBB(2) << " ymax: "
 			<< tld.currentBB(3) << std::endl;
