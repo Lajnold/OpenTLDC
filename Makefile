@@ -39,9 +39,6 @@ OBJS := \
 ./utils/median.o 
 
 
-SRCS = $(OBJS,.o=.cpp)
-CPP_DEPS = $(OBJS,.o=.d)
-
 .PHONY: all clean
 
 tldc: $(OBJS)
@@ -59,6 +56,8 @@ clean:
 %.o: %.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
-	$(CC) $(CFLAGS) $(INCLUDES) $(OPTS) -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o"$@" "$<"
+	$(CC) $(CFLAGS) $(INCLUDES) $(OPTS) -MF"%.d" -o"$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
+
+-include $(OBJS:.o=.d)
