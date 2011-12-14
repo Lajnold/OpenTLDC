@@ -88,8 +88,8 @@ Eigen::VectorXd tldTracking(TldStruct& tld, Eigen::VectorXd const & bb, int i, i
 
 	//bounding box out of image
 	Eigen::Vector2i imgsize;
-	imgsize(0) = tld.imgsize.m;
-	imgsize(1) = tld.imgsize.n;
+	imgsize(0) = tld.currentImg.input.width();
+	imgsize(1) = tld.currentImg.input.height();
 	if (!bb_isdef(bb2) || bb_isout(bb2, imgsize)) {
 		bb2 = Eigen::Vector4d::Constant(std::numeric_limits<double>::quiet_NaN());
 		return bb2;

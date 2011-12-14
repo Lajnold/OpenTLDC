@@ -63,7 +63,7 @@ void bb_scan(TldStruct& tld, Eigen::Vector4d const & bb,
 	}
 
 	Eigen::VectorXd bbF(4);
-	bbF << 2, 2, imsize(1), imsize(0); //  1: 640        0: 480
+	bbF << 2, 2, imsize(0), imsize(1);
 	Eigen::Matrix<double, 6, Eigen::Dynamic> bbs;
 	Eigen::Matrix<double, 6, Eigen::Dynamic> bbsbak;
 	Eigen::MatrixXd sca(2, 21);

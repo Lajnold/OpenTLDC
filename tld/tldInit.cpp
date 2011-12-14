@@ -38,13 +38,18 @@ void tldInit(TldStruct& tld) {
 	// initialize lucas kanade
 	lkInit();
 
+	// Get initial image
+	tld.cfg->imgsource->nextImage();
+	tld.currentImg.input = tld.cfg->imgsource->getGrayImage();
+	tld.currentImg.blur = img_blur(tld.currentImg.input);
+
 	// get initial bounding box
 	Eigen::Vector4d bb;
 	bb = tld.cfg->init;
 
 	Eigen::Vector2i imsize;
-	imsize(0) = tld.imgsize.m;
-	imsize(1) = tld.imgsize.n;
+	imsize(0) = tld.currentImg.input.width();
+	imsize(1) = tld.currentImg.input.height();
 	bb_scan(tld, bb, imsize, tld.model->min_win);
 
 	// Features
@@ -53,16 +58,8 @@ void tldInit(TldStruct& tld) {
 	// Initialize Detector
 	fern0();
 
-	ImgType im0;
-
-	tld.cfg->imgsource->nextImage();
-	im0.input = tld.cfg->imgsource->getGrayImage();
-
-	im0.blur = im0.input.clone();
-	im0.blur = img_blur(im0.blur);
-
 	// allocate structures
-	fern1(im0.input, tld.grid, tld.features, tld.scales);
+	fern1(tld.currentImg.input, tld.grid, tld.features, tld.scales);
 
 	// Temporal structures
 	Tmp temporal;
@@ -76,17 +73,12 @@ void tldInit(TldStruct& tld) {
 
 	tld.prevBB = Eigen::Vector4d::Constant(
 			std::numeric_limits<double>::quiet_NaN());
-	tld.currentImg = im0;
 	tld.currentBB = bb;
 	tld.conf = 1;
 	tld.currentValid = 1;
 	tld.size = 1;
 
 	// TRAIN DETECTOR ==========================================================
-
-	// Initialize structures
-	tld.imgsize.m = DIMY;
-	tld.imgsize.n = DIMX;
 
 	Eigen::RowVectorXd overlap = bb_overlap(tld.currentBB, tld.nGrid, tld.grid.topRows(4));
 

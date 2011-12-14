@@ -29,8 +29,6 @@
 #define PATCHSIZE 15 // 15 x 15
 #define MAXPATCHES 100
 #define MAXDT 100
-#define DIMX 640
-#define DIMY 480
 
 #include <opencv/cv.h>
 #include <opencv/cvaux.h>
@@ -66,11 +64,6 @@ typedef struct {
 	CvImage blur;
 	CvImage input;
 } ImgType;
-
-typedef struct {
-	unsigned int m; // rows
-	unsigned int n; // cols
-} ImgSize;
 
 typedef struct {
 	unsigned int x;
@@ -158,7 +151,6 @@ typedef struct {
 	double currentValid;
 	double size;
 
-	ImgSize imgsize;
 	CvImage target;
 
 	int npex;

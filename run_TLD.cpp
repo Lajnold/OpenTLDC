@@ -146,8 +146,6 @@ int main(int argc, char* argv[]) {
 	opt.n_par = n_par;
 	opt.tracker = tracker;
 	opt.control = control;
-	opt.imgsize.m = DIMY;
-	opt.imgsize.n = DIMX;
 
 	tldExample(&opt, cfg);
 

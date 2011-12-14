@@ -179,10 +179,10 @@ void embedPex(CvImage img, TldStruct& tld) {
 	double rescale = tld.plot->patch_rescale;
 
 	// measure number of possible rows of patches
-	int nrow = floor(tld.imgsize.m / (rescale * tld.model->patchsize.x));
+	int nrow = floor(tld.currentImg.input.height() / (rescale * tld.model->patchsize.x));
 
 	// measure number of possible columns of patches
-	int ncol = floor(tld.imgsize.n / (rescale * tld.model->patchsize.y));
+	int ncol = floor(tld.currentImg.input.width() / (rescale * tld.model->patchsize.y));
 
 	// get prepared Eigen Matrix
 	Eigen::MatrixXd pex;
@@ -215,10 +215,10 @@ void embedNex(CvImage img, TldStruct& tld) {
 	double rescale = tld.plot->patch_rescale;
 
 	// measure number of possible rows of patches
-	int nrow = floor(tld.imgsize.m / (rescale * tld.model->patchsize.x));
+	int nrow = floor(tld.currentImg.input.height() / (rescale * tld.model->patchsize.x));
 
 	// measure number of possible columns of patches
-	int ncol = floor(tld.imgsize.n / (rescale * tld.model->patchsize.y));
+	int ncol = floor(tld.currentImg.input.width() / (rescale * tld.model->patchsize.y));
 
 	// get prepared Eigen Matrix
 	Eigen::MatrixXd nex;
