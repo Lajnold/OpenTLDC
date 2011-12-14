@@ -28,11 +28,12 @@
 #include "../mex/mex.h"
 #include <limits>
 
-void tldProcessFrame(TldStruct& tld, unsigned long i) {
+bool tldProcessFrame(TldStruct& tld, unsigned long i) {
 
 	tld.prevImg = tld.currentImg;
 
-	tld.cfg->imgsource->nextImage();
+	if(!tld.cfg->imgsource->nextImage())
+		return false;
 
 	//Input image
 	ImgType im0;
@@ -137,4 +138,6 @@ void tldProcessFrame(TldStruct& tld, unsigned long i) {
 	//LEARNING
 	if (tld.control.update_detector && tld.currentValid == 1)
 		tldLearning(tld, i);
+
+	return true;
 }

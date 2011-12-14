@@ -46,14 +46,14 @@ Eigen::Matrix<double, 20, 1> tldDetection(TldStruct& tld, int i, Eigen::Matrix<
 		double, 4, 20>& dBB, int& n);
 
 /* measures initial structures */
-void tldInit(TldStruct& tld/*, CamImage& source, Person& persondetect*/);
+bool tldInit(TldStruct& tld/*, CamImage& source, Person& persondetect*/);
 
 /* random features */
 void tldGenerateFeatures(TldStruct& tld, unsigned int nTREES,
 		unsigned int nFEAT);
 
 /* main method, is called on each loop */
-void tldProcessFrame(TldStruct& tld, unsigned long i);
+bool tldProcessFrame(TldStruct& tld, unsigned long i);
 
 /* tracks bounding box with lucas kanade */
 Eigen::VectorXd tldTracking(TldStruct& tld, Eigen::VectorXd const & bb, int i,

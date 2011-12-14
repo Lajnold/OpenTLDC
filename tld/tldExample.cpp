@@ -43,7 +43,9 @@ void tldExample(TldStruct* opt, Config& cfg) {
 
 	/* INITIALIZATION -------------------------------------- */
 
-	tldInit(tld);
+	if(!tldInit(tld))
+		return; // No images.
+
 	if (!cfg.nodisplay)
 		tldDisplay(0, 0, tld, t);
 
@@ -54,7 +56,10 @@ void tldExample(TldStruct* opt, Config& cfg) {
 	while (i < 2500) {
 
 		t = (double)getTickCount();
-		tldProcessFrame(tld, i);
+
+		if(!tldProcessFrame(tld, i))
+			break; // Out of images.
+
 		t = ((double)getTickCount() - t)/getTickFrequency();
 
 		if (!cfg.nodisplay)
@@ -67,6 +72,7 @@ void tldExample(TldStruct* opt, Config& cfg) {
 		i++;
 
 	}
-	cvDestroyWindow("Result");
 
+	if(!cfg.nodisplay)
+		cvDestroyWindow("Result");
 }

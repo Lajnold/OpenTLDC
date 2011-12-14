@@ -33,13 +33,15 @@
  *
  * @param tld learning structures
  */
-void tldInit(TldStruct& tld) {
+bool tldInit(TldStruct& tld) {
 
 	// initialize lucas kanade
 	lkInit();
 
 	// Get initial image
-	tld.cfg->imgsource->nextImage();
+	if(!tld.cfg->imgsource->nextImage())
+		return false;
+
 	tld.currentImg.input = tld.cfg->imgsource->getGrayImage();
 	tld.currentImg.blur = img_blur(tld.currentImg.input);
 
@@ -154,5 +156,7 @@ void tldInit(TldStruct& tld) {
 			conf_nn.cols() / 3).maxCoeff());
 	tld.model->thr_nn_valid = std::max(tld.model->thr_nn_valid,
 			tld.model->thr_nn);
+
+	return true;
 }
 
