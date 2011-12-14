@@ -1,7 +1,7 @@
 CC := g++
-INCLUDES := -I/usr/local/include/eigen3/
+INCLUDES := -I/usr/include/eigen3/
 LIBS := -lcv -lhighgui -lcxcore
-OPTS := -J3 -O2 -pipe -Wall -c -fmessage-length=0 -MMD -MP 
+OPTS := -J3 -O2 -g -pipe -Wall -c -fmessage-length=0 -MMD -MP
 CFLAGS :=
 USRLIB := -L/usr/lib
 
