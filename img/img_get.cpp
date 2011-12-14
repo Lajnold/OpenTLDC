@@ -20,10 +20,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#include "cv.h"
-#include "highgui.h"
+
 #include <iostream>
 #include "img.h"
+
 IplImage* img = 0;
 IplImage* grayimg = 0;
 IplImage* colored = 0;

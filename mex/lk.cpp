@@ -21,8 +21,8 @@
  *
  */
 
-#include <cv.h>
-#include <highgui.h>
+#include <opencv/cv.h>
+#include <opencv/highgui.h>
 #include <math.h>
 #include <iostream>
 #include <limits>

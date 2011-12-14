@@ -25,10 +25,11 @@
 #define TLD_H_
 
 #include <iostream>
+#include <opencv/cv.h>
+#include <opencv/cxcore.h>
+#include <opencv/highgui.h>
+
 #include "structs.h"
-#include "cv.h"
-#include "cxcore.h"
-#include "highgui.h"
 
 using namespace cv;
 

@@ -32,8 +32,8 @@
 #define DIMX 640
 #define DIMY 480
 
-#include "cv.h"
-#include "highgui.h"
+#include <opencv/cv.h>
+#include <opencv/highgui.h>
 
 #include <Eigen/Dense>
 #include <Eigen/Core>

@@ -24,10 +24,11 @@
 #ifndef IMG_H_
 #define IMG_H_
 
+#include <math.h>
+#include <opencv/cv.h>
+#include <opencv/highgui.h>
+
 #include "../tld/tld.h"
-#include "cv.h"
-#include "highgui.h"
-#include "math.h"
 
 IplImage* img_patch(IplImage* img, Eigen::Vector4d const & bb, double randomize,
 		p_par& p_par);

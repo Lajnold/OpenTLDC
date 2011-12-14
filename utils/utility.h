@@ -31,8 +31,8 @@
 #include <Eigen/Core>
 #include "../tld/structs.h"
 
-#include "cv.h"
-#include "highgui.h"
+#include <opencv/cv.h>
+#include <opencv/highgui.h>
 
 Eigen::MatrixXd mat2img(Eigen::Matrix<double, (PATCHSIZE * PATCHSIZE),
 		Eigen::Dynamic> const & data, int n, unsigned int nrow);
