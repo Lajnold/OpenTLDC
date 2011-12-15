@@ -24,10 +24,9 @@
 #ifndef BBOX_H_
 #define BBOX_H_
 
+#include <Eigen/Core>
 #include <opencv/cv.h>
-#include <opencv/highgui.h>
-
-using namespace cv;
+#include <opencv/cvaux.h>
 
 #include "../tld/structs.h"
 
@@ -128,7 +127,7 @@ inline Eigen::Vector4d bb_rescalerel(Eigen::Vector4d const & bb,
 /**
  * The function draws a rectangle with coordinates given by a vector and a defined color.
  */
-inline void bb_draw(CvImage img, Eigen::Vector4d const & bb, Scalar color,
+inline void bb_draw(CvImage img, Eigen::Vector4d const & bb, cv::Scalar color,
 		unsigned int linewidth) {
 	if (bb.isZero()) {
 		return;
@@ -149,7 +148,7 @@ inline void bb_draw_add_color(CvImage img, Eigen::Vector4d const & bb) {
 	if (bb.isZero()) {
 		return;
 	} else {
-		Scalar yellow = Scalar(0, 255, 255);
+		cv::Scalar yellow = cv::Scalar(0, 255, 255);
 		bb_draw(img, bb, yellow, 2);
 	}
 }
