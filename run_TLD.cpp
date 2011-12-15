@@ -87,9 +87,6 @@ int main(int argc, char* argv[]) {
 			== -1)
 		exit(0);
 
-	tldInitDefaultTldStruct(tld);
-	tldSetBB(tld, initBB);
-
 	if(camindex >= 0)
 		captureSource = cvCaptureFromCAM(camindex);
 	else if(!videopath.empty())
@@ -97,7 +94,19 @@ int main(int argc, char* argv[]) {
 	else
 		assert(false && "No image source.");
 
-	tld.cfg.imgsource = new CvCaptureImageSource(captureSource);
+	CvCaptureImageSource imgsource(captureSource);
+
+	for(int i = 0; i < startFrame; i++) {
+		// Ignore all frames up to startFrame.
+		if(!imgsource.nextImage()) {
+			cvReleaseCapture(&captureSource);
+			exit(0); // Ran out of images.
+		}
+	}
+
+	tldInitDefaultTldStruct(tld);
+	tldSetImageSource(tld, &imgsource);
+	tldSetBB(tld, initBB);
 
 	for(int i = 0; i < startFrame; i++) {
 		// Ignore all frames up to startFrame.
@@ -106,4 +115,5 @@ int main(int argc, char* argv[]) {
 	}
 
 	tldExample(tld, !nodisplay);
+	cvReleaseCapture(&captureSource);
 }
