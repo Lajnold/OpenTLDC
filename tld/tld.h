@@ -35,6 +35,9 @@ void tldExample(TldStruct& tld, bool display);
 /* measures initial structures */
 bool tldInit(TldStruct& tld/*, CamImage& source, Person& persondetect*/);
 
+/* Sets decent default TLD parameters. */
+void tldInitDefaultTldStruct(TldStruct& tld);
+
 /* main method, is called on each loop */
 bool tldProcessFrame(TldStruct& tld, unsigned long i);
 

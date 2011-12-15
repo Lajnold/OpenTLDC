@@ -32,7 +32,7 @@
 #include <opencv/cxcore.h>
 #include <opencv/highgui.h>
 
-#include "tld.h"
+#include "structs.h"
 #include "tldconst.h"
 #include "../bbox/bbox.h"
 #include "../img/img.h"
@@ -525,6 +525,42 @@ bool tldInit(TldStruct& tld) {
 			tld.model.thr_nn);
 
 	return true;
+}
+
+void tldInitDefaultTldStruct(TldStruct& tld) {
+	//tld.cfg.plot.save = 0;
+	tld.cfg.plot.patch_rescale = 1;
+	tld.cfg.plot.pex = 0;
+	tld.cfg.plot.nex = 0;
+	tld.cfg.plot.target = 0;
+	tld.cfg.plot.replace = 0;
+	//tld.cfg.plot.dt = 1;
+	tld.cfg.plot.drawoutput = 3;
+	//tld.cfg.plot.confidence = 1;
+
+	tld.model.num_trees = TLD_NTREES;
+	tld.model.num_features = TLD_NFEATURES;
+	tld.model.patchsize.x = TLD_PATCHSIZE;
+	tld.model.patchsize.y = TLD_PATCHSIZE;
+	tld.model.min_win = 24;
+	tld.model.fliplr = 0; // mirrored versions of object
+	tld.model.ncc_thesame = 0.95;
+	tld.model.valid = 0.5;
+	tld.model.thr_fern = 0.5;
+	tld.model.thr_nn = 0.65;
+	tld.model.thr_nn_valid = 0.7;
+
+	P_par p_par_init = { 10, 20, 5, 20, 0.02, 0.02 };
+	P_par p_par_update = { 10, 10, 5, 10, 0.02, 0.02 };
+	N_par n_par = { 0.2, 100 };
+	Tracker tracker = { 10 };
+	Control control = { 1, 1, 1, 1 };
+
+	tld.p_par_init = p_par_init;
+	tld.p_par_update = p_par_update;
+	tld.n_par = n_par;
+	tld.tracker = tracker;
+	tld.control = control;
 }
 
 /**

@@ -36,13 +36,13 @@
 
 // Plot
 struct Plot {
-	unsigned int save;
+	//unsigned int save;
 	unsigned int pex;
 	unsigned int nex;
 	unsigned int target;
 	unsigned int replace;
-	unsigned int dt;
-	unsigned int confidence;
+	//unsigned int dt;
+	//unsigned int confidence;
 	unsigned int drawoutput;
 	double patch_rescale;
 };
