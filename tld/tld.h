@@ -97,12 +97,6 @@ void tldTrainNN(
 Eigen::Matrix<double, 3, Eigen::Dynamic> tldNN(Eigen::Matrix<double, PATCHSIZE
 		* PATCHSIZE, Eigen::Dynamic> const & nEx2, TldStruct& tld);
 
-/* Shows positive examples */
-void embedPex(CvImage img, TldStruct& tld);
-
-/* Shows negative examples */
-void embedNex(CvImage img, TldStruct& tld);
-
 /* Learns detected pattern */
 void tldLearning(TldStruct& tld, unsigned long I);
 

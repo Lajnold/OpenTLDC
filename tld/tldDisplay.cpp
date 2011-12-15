@@ -31,6 +31,78 @@
 #include <string>
 
 /**
+ * Puts all positive patches on image.
+ *
+ * @param img output image
+ * @param tld learned structures
+ */
+static void embedPex(CvImage img, TldStruct& tld) {
+
+
+	double rescale = tld.cfg.plot.patch_rescale;
+
+	// measure number of possible rows of patches
+	int nrow = floor(tld.currentImg.input.height() / (rescale * tld.model.patchsize.x));
+
+	// measure number of possible columns of patches
+	int ncol = floor(tld.currentImg.input.width() / (rescale * tld.model.patchsize.y));
+
+	// get prepared Eigen Matrix
+	Eigen::MatrixXd pex;
+	if (tld.npex > nrow * ncol) { // max nrow * ncol
+		pex = mat2img(tld.pex.leftCols(nrow * ncol), nrow * ncol, nrow);
+	} else {
+		pex = mat2img(tld.pex, tld.npex, nrow);
+	}
+
+	int pH = pex.rows();
+	int pW = pex.cols();
+
+	// include in output image
+	for (int y = 0; y < pH; y++)
+		for (int x = img.width() - pW; x < img.width(); x++) {
+			((uchar*) (img.data() + img.step() * (y)))[x] = 255 * pex(
+					y, x - (img.width() - pW));
+
+		}
+}
+
+/**
+ * Puts all negative patches on image.
+ *
+ * @param img output image
+ * @param tld learned structures
+ */
+static void embedNex(CvImage img, TldStruct& tld) {
+
+	double rescale = tld.cfg.plot.patch_rescale;
+
+	// measure number of possible rows of patches
+	int nrow = floor(tld.currentImg.input.height() / (rescale * tld.model.patchsize.x));
+
+	// measure number of possible columns of patches
+	int ncol = floor(tld.currentImg.input.width() / (rescale * tld.model.patchsize.y));
+
+	// get prepared Eigen Matrix
+	Eigen::MatrixXd nex;
+	if (tld.nnex > nrow * ncol) { // max nrow * ncol
+		nex = mat2img(tld.nex.leftCols(nrow * ncol), nrow * ncol, nrow);
+	} else {
+		nex = mat2img(tld.nex, tld.nnex, nrow);
+	}
+
+	int pH = nex.rows();
+	int pW = nex.cols();
+
+	// include in output image
+	for (int y = 0; y < pH; y++)
+		for (int x = 0; x < pW; x++) {
+			((uchar*) (img.data() + img.step() * (y)))[x]
+					= 255 * nex(y, x);
+		}
+}
+
+/**
  * Is used to show results on window. Current bounding box,
  * positives and negatives, current target.
  *
@@ -164,76 +236,4 @@ void tldDisplay(int i, unsigned long index, TldStruct& tld, double fps) {
 			std::cout << "key pressed" << std::endl;
 
 	}
-}
-
-/**
- * Puts all positive patches on image.
- *
- * @param img output image
- * @param tld learned structures
- */
-void embedPex(CvImage img, TldStruct& tld) {
-
-
-	double rescale = tld.cfg.plot.patch_rescale;
-
-	// measure number of possible rows of patches
-	int nrow = floor(tld.currentImg.input.height() / (rescale * tld.model.patchsize.x));
-
-	// measure number of possible columns of patches
-	int ncol = floor(tld.currentImg.input.width() / (rescale * tld.model.patchsize.y));
-
-	// get prepared Eigen Matrix
-	Eigen::MatrixXd pex;
-	if (tld.npex > nrow * ncol) { // max nrow * ncol
-		pex = mat2img(tld.pex.leftCols(nrow * ncol), nrow * ncol, nrow);
-	} else {
-		pex = mat2img(tld.pex, tld.npex, nrow);
-	}
-
-	int pH = pex.rows();
-	int pW = pex.cols();
-
-	// include in output image
-	for (int y = 0; y < pH; y++)
-		for (int x = img.width() - pW; x < img.width(); x++) {
-			((uchar*) (img.data() + img.step() * (y)))[x] = 255 * pex(
-					y, x - (img.width() - pW));
-
-		}
-}
-
-/**
- * Puts all negative patches on image.
- *
- * @param img output image
- * @param tld learned structures
- */
-void embedNex(CvImage img, TldStruct& tld) {
-
-	double rescale = tld.cfg.plot.patch_rescale;
-
-	// measure number of possible rows of patches
-	int nrow = floor(tld.currentImg.input.height() / (rescale * tld.model.patchsize.x));
-
-	// measure number of possible columns of patches
-	int ncol = floor(tld.currentImg.input.width() / (rescale * tld.model.patchsize.y));
-
-	// get prepared Eigen Matrix
-	Eigen::MatrixXd nex;
-	if (tld.nnex > nrow * ncol) { // max nrow * ncol
-		nex = mat2img(tld.nex.leftCols(nrow * ncol), nrow * ncol, nrow);
-	} else {
-		nex = mat2img(tld.nex, tld.nnex, nrow);
-	}
-
-	int pH = nex.rows();
-	int pW = nex.cols();
-
-	// include in output image
-	for (int y = 0; y < pH; y++)
-		for (int x = 0; x < pW; x++) {
-			((uchar*) (img.data() + img.step() * (y)))[x]
-					= 255 * nex(y, x);
-		}
 }
