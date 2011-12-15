@@ -26,7 +26,7 @@
 
 #include "structs.h"
 
-/* Shows Results in additional window */
+/* Shows results in additional window */
 void tldDisplay(int i, unsigned long index, TldStruct& tld, double fps);
 
 /* Main Loop */
