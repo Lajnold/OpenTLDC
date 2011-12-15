@@ -160,10 +160,10 @@ struct TldStruct {
 
 	CvImage handle;
 
-	Eigen::Vector4d reinitBB;
-	bool isReinitBB;
+	Eigen::Vector4d newBB;
+	bool hasNewBB;
 
-	TldStruct() : isReinitBB(false) { }
+	TldStruct() : hasNewBB(false) { }
 };
 
 #endif

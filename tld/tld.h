@@ -38,8 +38,8 @@ bool tldInit(TldStruct& tld/*, CamImage& source, Person& persondetect*/);
 /* main method, is called on each loop */
 bool tldProcessFrame(TldStruct& tld, unsigned long i);
 
-/* Set a new bounding box. */
-void tldReinitBB(TldStruct& tld, Eigen::Vector4d& bb);
+/** Sets a new bounding box for the object. */
+void tldSetBB(TldStruct& tld, Eigen::Vector4d& bb);
 
 #endif /* TLD_H_ */
 

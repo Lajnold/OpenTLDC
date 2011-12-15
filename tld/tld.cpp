@@ -1152,12 +1152,12 @@ bool tldProcessFrame(TldStruct& tld, unsigned long i) {
 				//tld.size = cluster(0, 2);
 				tld.currentValid = 0;
 			}
-	} else if (tld.isReinitBB) {
-		tld.currentBB = tld.reinitBB;
+	} else if (tld.hasNewBB) {
+		tld.currentBB = tld.newBB;
 		tld.conf = 1;
 		//tld.size = ???
 		tld.currentValid = 1;
-		tld.isReinitBB = false;
+		tld.hasNewBB = false;
 	}
 
 	//LEARNING
@@ -1167,12 +1167,9 @@ bool tldProcessFrame(TldStruct& tld, unsigned long i) {
 	return true;
 }
 
-/**
- * Reinits the tracker at a given location.
- */
-void tldReinitBB(TldStruct& tld, Vector4d& bb) {
-    tld.reinitBB = bb;
-    tld.isReinitBB = true;
+void tldSetBB(TldStruct& tld, Vector4d& bb) {
+    tld.newBB = bb;
+    tld.hasNewBB = true;
 }
 
 /*Splits negative data to training and validation set*/
