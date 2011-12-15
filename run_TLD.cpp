@@ -129,8 +129,8 @@ int main(int argc, char* argv[]) {
 	tld.model.thr_nn = 0.65;
 	tld.model.thr_nn_valid = 0.7;
 
-	p_par p_par_init = { 10, 20, 5, 20, 0.02, 0.02 };
-	p_par p_par_update = { 10, 10, 5, 10, 0.02, 0.02 };
+	P_par p_par_init = { 10, 20, 5, 20, 0.02, 0.02 };
+	P_par p_par_update = { 10, 10, 5, 10, 0.02, 0.02 };
 	N_par n_par = { 0.2, 100 };
 	Tracker tracker = { 10 };
 	Control control = { 1, 1, 1, 1 };

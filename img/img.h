@@ -31,7 +31,7 @@
 #include "../tld/structs.h"
 
 CvImage img_patch(CvImage img, Eigen::Vector4d const & bb, double randomize,
-		p_par& p_par);
+		P_par& p_par);
 
 CvImage img_patch(CvImage img, Eigen::Vector4d const & bb);
 

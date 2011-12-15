@@ -61,7 +61,7 @@ Eigen::VectorXd tldTracking(TldStruct& tld, Eigen::VectorXd const & bb, int i,
 
 /* duplicates slightly altered previous found positive patches */
 Eigen::Vector4d tldGeneratePositiveData(TldStruct& tld,
-		Eigen::MatrixXd const & overlap, ImgType& img, p_par& p_par,
+		Eigen::MatrixXd const & overlap, ImgType& img, P_par& p_par,
 		Eigen::Matrix<double, NTREES, Eigen::Dynamic>& pX, Eigen::Matrix<
 				double, (PATCHSIZE * PATCHSIZE), Eigen::Dynamic>& pEx);
 

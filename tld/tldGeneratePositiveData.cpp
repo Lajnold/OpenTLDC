@@ -39,7 +39,7 @@
  * @return bbP0 closest bbox
  */
 Eigen::Vector4d tldGeneratePositiveData(TldStruct& tld,
-		Eigen::MatrixXd const & overlap, ImgType& img, p_par& p_par,
+		Eigen::MatrixXd const & overlap, ImgType& img, P_par& p_par,
 		Eigen::Matrix<double, NTREES, Eigen::Dynamic>& pX, Eigen::Matrix<
 				double, (PATCHSIZE * PATCHSIZE), Eigen::Dynamic>& pEx) {
 

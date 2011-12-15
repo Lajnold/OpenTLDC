@@ -40,7 +40,7 @@
 #include "../img/ImageSource.h"
 
 // Plot
-typedef struct {
+struct Plot {
 	unsigned int save;
 	unsigned int pex;
 	unsigned int nex;
@@ -50,29 +50,29 @@ typedef struct {
 	unsigned int confidence;
 	unsigned int drawoutput;
 	double patch_rescale;
-} Plot;
+};
 
 // Configuration
-typedef struct {
+struct Config {
 	ImageSource *imgsource;
 	Eigen::Vector4d initBB;
 	Plot plot;
-} Config;
+};
 
 
 // Blured image and input image (grayscale)
-typedef struct {
+struct ImgType {
 	CvImage blur;
 	CvImage input;
-} ImgType;
+};
 
-typedef struct {
+struct Patchsize {
 	unsigned int x;
 	unsigned int y;
-} Patchsize;
+};
 
 // Carries initial thresholds
-typedef struct {
+struct Model {
 	Patchsize patchsize;
 	unsigned char fliplr;
 	unsigned int min_win;
@@ -84,53 +84,53 @@ typedef struct {
 	double thr_nn;
 	double thr_nn_valid;
 	//unsigned int num_init;
-} Model;
+};
 
 // Temporal confidelity and pattern
-typedef struct {
+struct Tmp {
 	Eigen::VectorXd conf;
 	Eigen::Matrix<double, 10, Eigen::Dynamic> patt;
-} Tmp;
+};
 
-typedef struct {
+struct P_par {
 	unsigned int num_closest;
 	unsigned int num_warps;
 	unsigned int noise;
 	unsigned int angle;
 	double shift;
 	double scale;
-} p_par;
+};
 
-typedef struct {
+struct N_par {
 	double overlap;
 	unsigned int num_patches;
-} N_par;
+};
 
-typedef struct {
+struct Tracker {
 	unsigned int occlusion;
-} Tracker;
+};
 
-typedef struct {
+struct Control {
 	unsigned char maxbbox;
 	unsigned char update_detector;
 	unsigned char drop_img;
 	unsigned char repeat;
-} Control;
+};
 
-typedef struct {
+struct Detection {
 	Eigen::Matrix<double, 4, MAXDT> bb;
 	int nbb;
 	Eigen::Matrix<double, MAXDT, 1> conf2;
 	Eigen::Matrix<double, (PATCHSIZE * PATCHSIZE), MAXDT> patch;
-} Detection;
+};
 
 // Structure of TLD
-typedef struct {
+struct TldStruct {
 	Model model;
 	Config cfg;
 	Tmp tmp;
-	p_par p_par_init;
-	p_par p_par_update;
+	P_par p_par_init;
+	P_par p_par_update;
 	N_par n_par;
 	Tracker tracker;
 	Control control;
@@ -164,6 +164,6 @@ typedef struct {
 	double var;
 
 	CvImage handle;
-} TldStruct;
+};
 
 #endif
