@@ -1204,8 +1204,12 @@ bool tldProcessFrame(TldStruct& tld, unsigned long i) {
 }
 
 void tldSetBB(TldStruct& tld, Vector4d& bb) {
-    tld.newBB = bb;
-    tld.hasNewBB = true;
+	tld.newBB = bb;
+	tld.hasNewBB = true;
+}
+
+void tldSetImageSource(TldStruct& tld, ImageSource *src) {
+	tld.cfg.imgsource = src;
 }
 
 /*Splits negative data to training and validation set*/

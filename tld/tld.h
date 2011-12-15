@@ -44,5 +44,8 @@ bool tldProcessFrame(TldStruct& tld, unsigned long i);
 /** Sets a new bounding box for the object. */
 void tldSetBB(TldStruct& tld, Eigen::Vector4d& bb);
 
+/** Sets the image source. */
+void tldSetImageSource(TldStruct& tld, ImageSource *src);
+
 #endif /* TLD_H_ */
 
