@@ -83,7 +83,7 @@ typedef struct {
 	double thr_fern;
 	double thr_nn;
 	double thr_nn_valid;
-	unsigned int num_init;
+	//unsigned int num_init;
 } Model;
 
 // Temporal confidelity and pattern
@@ -149,7 +149,7 @@ typedef struct {
 	double conf;
 	double prevValid;
 	double currentValid;
-	double size;
+	//double size;
 
 	CvImage target;
 

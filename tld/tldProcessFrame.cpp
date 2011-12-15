@@ -78,7 +78,7 @@ bool tldProcessFrame(TldStruct& tld, unsigned long i) {
 	}
 	if (TR) {
 		//copy tracker's result
-		tld.size = 1;
+		//tld.size = 1;
 		if (DT) {
 			//cluster detections
 			Eigen::MatrixXd cluster = bb_cluster_confidence(dBB, detConf, nD);
@@ -101,7 +101,7 @@ bool tldProcessFrame(TldStruct& tld, unsigned long i) {
 			if (id.size() == 1) {
 				tld.currentBB = cBB.col(id[0]);
 				tld.conf = cConf(0, id[0]);
-				tld.size = cSize(0, id[0]);
+				//tld.size = cSize(0, id[0]);
 				tld.currentValid = 0;
 			} else {
 				//adjust the tracker's trajectory
@@ -121,18 +121,16 @@ bool tldProcessFrame(TldStruct& tld, unsigned long i) {
 				tld.currentBB = meanmat.rowwise().mean();
 			}
 		}
-	} else {
-		if (DT) {
+	} else if (DT) {
 			//cluster detections
 			Eigen::MatrixXd cluster = bb_cluster_confidence(dBB, detConf, nD);
 			//if there is just a single cluster, re-initialize the tracker
 			if (cluster.cols() / 3 == 1) {
 				tld.currentBB = cluster.col(0);
 				tld.conf = cluster(0, 1);
-				tld.size = cluster(0, 2);
+				//tld.size = cluster(0, 2);
 				tld.currentValid = 0;
 			}
-		}
 	}
 
 	//LEARNING

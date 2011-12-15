@@ -77,7 +77,7 @@ bool tldInit(TldStruct& tld) {
 	tld.currentBB = bb;
 	tld.conf = 1;
 	tld.currentValid = 1;
-	tld.size = 1;
+	//tld.size = 1;
 
 	// TRAIN DETECTOR ==========================================================
 
@@ -134,7 +134,7 @@ bool tldInit(TldStruct& tld) {
 	tld.nnex = 0;
 
 	tldTrainNN(pEx, spnEx.leftCols(spnEx.cols() / 2), tld);
-	tld.model.num_init = tld.npex;
+	//tld.model.num_init = tld.npex;
 
 	// Estimate thresholds on validation set  ----------------------------------
 
