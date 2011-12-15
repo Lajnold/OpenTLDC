@@ -4,6 +4,7 @@ LIBS := -lcv -lhighgui -lcxcore
 OPTS := -O2 -g -pipe -Wall -c -fmessage-length=0 -MMD -MP
 CFLAGS :=
 USRLIB := -L/usr/lib
+TAGS = ctags --fields=+S
 
 OBJS := \
 ./run_TLD.o \
@@ -38,6 +39,9 @@ OBJS := \
 ./utils/mat2img.o \
 ./utils/median.o 
 
+SRCS = $(OBJS:.o=.cpp)
+HDRS = tld/*.h bbox/*.h img/*.h mex/*.h utils/*.h
+
 .PHONY: all clean
 
 tldc: $(OBJS)
@@ -47,8 +51,12 @@ tldc: $(OBJS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
+tags: $(SRCS) $(HDRS)
+	$(TAGS) $(SRCS) $(HDRS)
+
 clean:
 	-$(RM) $(OBJS) *.d **/*.d tldc
+	-$(RM) tags
 	-@echo ' '
 
 
