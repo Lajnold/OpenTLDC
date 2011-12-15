@@ -24,82 +24,22 @@
 #ifndef TLD_H_
 #define TLD_H_
 
-#include <iostream>
-#include <opencv/cv.h>
-#include <opencv/cxcore.h>
-#include <opencv/highgui.h>
-
 #include "structs.h"
-
-using namespace cv;
-
-/* Set a new bounding box. */
-void tldReinitBB(TldStruct& tld, Eigen::Vector4d& bb);
-
-/* Main Loop */
-void tldExample(TldStruct& tld, bool display);
 
 /* Shows Results in additional window */
 void tldDisplay(int i, unsigned long index, TldStruct& tld, double fps);
 
-/* Detects learned patches */
-Eigen::Matrix<double, 20, 1> tldDetection(TldStruct& tld, int i, Eigen::Matrix<
-		double, 4, 20>& dBB, int& n);
+/* Main Loop */
+void tldExample(TldStruct& tld, bool display);
 
 /* measures initial structures */
 bool tldInit(TldStruct& tld/*, CamImage& source, Person& persondetect*/);
 
-/* random features */
-void tldGenerateFeatures(TldStruct& tld, unsigned int nTREES,
-		unsigned int nFEAT);
-
 /* main method, is called on each loop */
 bool tldProcessFrame(TldStruct& tld, unsigned long i);
 
-/* tracks bounding box with lucas kanade */
-Eigen::VectorXd tldTracking(TldStruct& tld, Eigen::VectorXd const & bb, int i,
-		int j);
-
-/* duplicates slightly altered previous found positive patches */
-Eigen::Vector4d tldGeneratePositiveData(TldStruct& tld,
-		Eigen::MatrixXd const & overlap, ImgType& img, P_par& p_par,
-		Eigen::Matrix<double, TLD_NTREES, Eigen::Dynamic>& pX, Eigen::Matrix<
-				double, (TLD_PATCHSIZE * TLD_PATCHSIZE), Eigen::Dynamic>& pEx);
-
-/* pickups bbox and converts to Eigen matrix */
-Eigen::Matrix<double, (TLD_PATCHSIZE * TLD_PATCHSIZE), Eigen::Dynamic> tldGetPattern(
-		ImgType& img, Eigen::Matrix<double, 4, Eigen::Dynamic> const & bb,
-		Patchsize& patchsize, unsigned int flip);
-
-/* generates initial some random negative patches */
-void tldGenerateNegativeData(TldStruct& tld,
-		Eigen::RowVectorXd const & overlap, ImgType& img, Eigen::Matrix<double,
-				TLD_NTREES, Eigen::Dynamic>& nX, Eigen::Matrix<double, (TLD_PATCHSIZE
-				* TLD_PATCHSIZE), Eigen::Dynamic>& nEx);
-
-/* random permutation of generated negatives and splits it to validation and training set */
-void tldSplitNegativeData(
-				Eigen::Matrix<double, TLD_NTREES, Eigen::Dynamic> const & nX,
-				Eigen::Matrix<double, TLD_PATCHSIZE * TLD_PATCHSIZE, Eigen::Dynamic> const & nEx,
-				Eigen::Matrix<double, TLD_NTREES, Eigen::Dynamic>& spnX,
-				Eigen::Matrix<double, TLD_PATCHSIZE * TLD_PATCHSIZE, Eigen::Dynamic>& spnEx);
-
-/* Converts an image to Eigen Matrix */
-Eigen::Matrix<double, TLD_PATCHSIZE * TLD_PATCHSIZE, 1> tldPatch2Pattern(
-		CvImage patch, Patchsize const& patchsize);
-
-/* Trains nearest neighbor */
-void tldTrainNN(
-				Eigen::Matrix<double, TLD_PATCHSIZE * TLD_PATCHSIZE, Eigen::Dynamic> const & pEx,
-				Eigen::Matrix<double, TLD_PATCHSIZE * TLD_PATCHSIZE, Eigen::Dynamic> const & nEx1,
-				TldStruct& tld);
-
-/* Classifies examples as positive or negative */
-Eigen::Matrix<double, 3, Eigen::Dynamic> tldNN(Eigen::Matrix<double, TLD_PATCHSIZE
-		* TLD_PATCHSIZE, Eigen::Dynamic> const & nEx2, TldStruct& tld);
-
-/* Learns detected pattern */
-void tldLearning(TldStruct& tld, unsigned long I);
+/* Set a new bounding box. */
+void tldReinitBB(TldStruct& tld, Eigen::Vector4d& bb);
 
 #endif /* TLD_H_ */
 

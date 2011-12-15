@@ -21,22 +21,8 @@ OBJS := \
 ./mex/fern.o \
 ./mex/lk.o \
 ./mex/warp.o \
-./tld/tldDetection.o \
-./tld/tldDisplay.o \
+./tld/tld.o \
 ./tld/tldExample.o \
-./tld/tldGenerateFeatures.o \
-./tld/tldGenerateNegativeData.o \
-./tld/tldGeneratePositiveData.o \
-./tld/tldGetPattern.o \
-./tld/tldInit.o \
-./tld/tldLearning.o \
-./tld/tldNN.o \
-./tld/tldPatch2Pattern.o \
-./tld/tldProcessFrame.o \
-./tld/tldSplitNegativeData.o \
-./tld/tldReinitBB.o \
-./tld/tldTracking.o \
-./tld/tldTrainNN.o \
 ./utils/mat2img.o \
 ./utils/median.o 
 
