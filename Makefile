@@ -34,6 +34,7 @@ OBJS := \
 ./tld/tldPatch2Pattern.o \
 ./tld/tldProcessFrame.o \
 ./tld/tldSplitNegativeData.o \
+./tld/tldReinitBB.o \
 ./tld/tldTracking.o \
 ./tld/tldTrainNN.o \
 ./utils/mat2img.o \

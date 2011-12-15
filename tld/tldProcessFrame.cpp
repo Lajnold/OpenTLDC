@@ -131,6 +131,12 @@ bool tldProcessFrame(TldStruct& tld, unsigned long i) {
 				//tld.size = cluster(0, 2);
 				tld.currentValid = 0;
 			}
+	} else if (tld.isReinitBB) {
+		tld.currentBB = tld.reinitBB;
+		tld.conf = 1;
+		//tld.size = ???
+		tld.currentValid = 1;
+		tld.isReinitBB = false;
 	}
 
 	//LEARNING

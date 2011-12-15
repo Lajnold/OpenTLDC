@@ -164,6 +164,11 @@ struct TldStruct {
 	double var;
 
 	CvImage handle;
+
+	Eigen::Vector4d reinitBB;
+	bool isReinitBB;
+
+	TldStruct() : isReinitBB(false) { }
 };
 
 #endif

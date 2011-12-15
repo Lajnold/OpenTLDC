@@ -33,6 +33,9 @@
 
 using namespace cv;
 
+/* Set a new bounding box. */
+void tldReinitBB(TldStruct& tld, Eigen::Vector4d& bb);
+
 /* Main Loop */
 void tldExample(TldStruct& tld, bool display);
 
