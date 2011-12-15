@@ -21,6 +21,8 @@
  *
  */
 
+#include <cmath>
+
 #include "img.h"
 #include "../utils/utility.h"
 #include "../bbox/bbox.h"
@@ -45,7 +47,7 @@ CvImage img_patch(CvImage img, Eigen::Vector4d const & bb, double randomize,
 	Eigen::Matrix3d Sca;
 	Sca << sca, 0, 0, 0, sca, 0, 0, 0, 1;
 
-	double ang = 2 * PI / 360 * ANGLE * (uniform() - 0.5);
+	double ang = 2 * M_PI / 360 * ANGLE * (uniform() - 0.5);
 	double ca = cos(ang);
 	double sa = sin(ang);
 

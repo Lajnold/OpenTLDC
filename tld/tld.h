@@ -33,8 +33,6 @@
 
 using namespace cv;
 
-#define PI 3.14159265358979L
-
 /* Main Loop */
 void tldExample(TldStruct& tld, bool display);
 
