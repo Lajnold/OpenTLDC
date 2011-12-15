@@ -98,14 +98,14 @@ Eigen::Vector4d tldGeneratePositiveData(TldStruct& tld,
 	im1.blur = cvCloneImage(img.blur);
 
 	// get positive patches from image
-	pEx = tldGetPattern(im1, bbP0, tld.model->patchsize, 0);
+	pEx = tldGetPattern(im1, bbP0, tld.model.patchsize, 0);
 
 
-	if (tld.model->fliplr == 1) {
+	if (tld.model.fliplr == 1) {
 		Eigen::MatrixXd pExbuf(pEx.rows(), pEx.cols());
 		pExbuf = pEx;
 		pEx.resize(pEx.rows(), pEx.cols() * 2);
-		pEx << pExbuf, tldGetPattern(im1, bbP0, tld.model->patchsize, 1);
+		pEx << pExbuf, tldGetPattern(im1, bbP0, tld.model.patchsize, 1);
 	}
 
 	pX.resize(NTREES, idxPi.size() * p_par.num_warps);

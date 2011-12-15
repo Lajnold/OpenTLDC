@@ -78,7 +78,7 @@ void tldGenerateNegativeData(TldStruct& tld,
 		bb.col(i) = tld.grid.block(0, idxN2[int(idx(0, i))], 4, 1);
 
 	// get patches from image
-	nEx.resize(tld.model->patchsize.x * tld.model->patchsize.y, bb.cols());
-	nEx = tldGetPattern(img, bb, tld.model->patchsize, 0);
+	nEx.resize(tld.model.patchsize.x * tld.model.patchsize.y, bb.cols());
+	nEx = tldGetPattern(img, bb, tld.model.patchsize, 0);
 
 }

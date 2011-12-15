@@ -101,7 +101,7 @@ Eigen::VectorXd tldTracking(TldStruct& tld, Eigen::VectorXd const & bb, int i, i
 	}
 	//sample patch in current image
 	Eigen::MatrixXd patchJ = tldGetPattern(tld.currentImg, bb2,
-			tld.model->patchsize, 0);
+			tld.model.patchsize, 0);
 	Conf = tldNN(patchJ, tld);
 	valid = tld.prevValid;
 
@@ -109,7 +109,7 @@ Eigen::VectorXd tldTracking(TldStruct& tld, Eigen::VectorXd const & bb, int i, i
 	double consSim;
 	consSim = Conf(0, confLen);
 	//tracking takes place
-	if (consSim > tld.model->thr_nn_valid)
+	if (consSim > tld.model.thr_nn_valid)
 		valid = 1;
 
 	tld.currentBB = bb2;

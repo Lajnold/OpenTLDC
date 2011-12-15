@@ -25,10 +25,7 @@
 
 #include "tld/tld.h"
 
-TldStruct opt;
-Plot plot;
-Model model;
-Config cfg;
+TldStruct tld;
 
 int main(int argc, char* argv[]) {
 
@@ -90,9 +87,7 @@ int main(int argc, char* argv[]) {
 			== -1)
 		exit(0);
 
-	cfg.init = initBB;
-	cfg.nodisplay = nodisplay;
-	//cfg.startFrame = startFrame;
+	tld.cfg.initBB = initBB;
 
 	if(camindex >= 0)
 		captureSource = cvCaptureFromCAM(camindex);
@@ -101,52 +96,50 @@ int main(int argc, char* argv[]) {
 	else
 		assert(false && "No image source.");
 
-	cfg.imgsource = new CvCaptureImageSource(captureSource);
+	tld.cfg.imgsource = new CvCaptureImageSource(captureSource);
 
 	for(int i = 0; i < startFrame; i++) {
 		// Ignore all frames up to startFrame.
-		if(!cfg.imgsource->nextImage())
+		if(!tld.cfg.imgsource->nextImage())
 			exit(0); // Ran out of images.
 	}
 
-	opt.plot = &plot;
-	opt.plot->save = 0;
-	opt.plot->patch_rescale = 1;
-	opt.plot->pex = 1;
-	opt.plot->nex = 1;
-	opt.plot->target = 0;
-	opt.plot->replace = 0;
-	opt.plot->dt = 1;
-	opt.plot->drawoutput = 3;
-	opt.plot->confidence = 1;
+	tld.cfg.plot.save = 0;
+	tld.cfg.plot.patch_rescale = 1;
+	tld.cfg.plot.pex = 0;
+	tld.cfg.plot.nex = 0;
+	tld.cfg.plot.target = 0;
+	tld.cfg.plot.replace = 0;
+	tld.cfg.plot.dt = 1;
+	tld.cfg.plot.drawoutput = 3;
+	tld.cfg.plot.confidence = 1;
 
-	opt.model = &model;
-	opt.model->num_trees = NTREES;
-	opt.model->num_features = NFEATURES;
+	tld.model.num_trees = NTREES;
+	tld.model.num_features = NFEATURES;
 
 	Patchsize patchsize;
 	patchsize.x = PATCHSIZE;
 	patchsize.y = PATCHSIZE;
-	opt.model->patchsize = patchsize;
-	opt.model->min_win = 24;
-	opt.model->fliplr = 0; // mirrored versions of object
-	opt.model->ncc_thesame = 0.95;
-	opt.model->valid = 0.5;
-	opt.model->thr_fern = 0.5;
-	opt.model->thr_nn = 0.65;
-	opt.model->thr_nn_valid = 0.7;
+	tld.model.patchsize = patchsize;
+	tld.model.min_win = 24;
+	tld.model.fliplr = 0; // mirrored versions of object
+	tld.model.ncc_thesame = 0.95;
+	tld.model.valid = 0.5;
+	tld.model.thr_fern = 0.5;
+	tld.model.thr_nn = 0.65;
+	tld.model.thr_nn_valid = 0.7;
 
 	p_par p_par_init = { 10, 20, 5, 20, 0.02, 0.02 };
 	p_par p_par_update = { 10, 10, 5, 10, 0.02, 0.02 };
 	N_par n_par = { 0.2, 100 };
 	Tracker tracker = { 10 };
 	Control control = { 1, 1, 1, 1 };
-	opt.p_par_init = p_par_init;
-	opt.p_par_update = p_par_update;
-	opt.n_par = n_par;
-	opt.tracker = tracker;
-	opt.control = control;
+	tld.p_par_init = p_par_init;
+	tld.p_par_update = p_par_update;
+	tld.n_par = n_par;
+	tld.tracker = tracker;
+	tld.control = control;
 
-	tldExample(&opt, cfg);
+	tldExample(tld, !nodisplay);
 
 }

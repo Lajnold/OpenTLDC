@@ -64,7 +64,7 @@ Eigen::Matrix<double, 3, Eigen::Dynamic> tldNN(Eigen::Matrix<double, PATCHSIZE
 		nccN = distance(nEx2.col(i), tld.nex, tld.nnex, 1);
 		//set isin
 		//IF the query patch is highly correlated with any positive patch in the model THEN it is considered to be one of them
-		if ((nccP.array() > tld.model->ncc_thesame).any())
+		if ((nccP.array() > tld.model.ncc_thesame).any())
 			isin(0, i) = 1;
 		Eigen::MatrixXd::Index maxRow, maxCol;
 		double dN, dP;
@@ -72,7 +72,7 @@ Eigen::Matrix<double, 3, Eigen::Dynamic> tldNN(Eigen::Matrix<double, PATCHSIZE
 		dN = nccP.maxCoeff(&maxRow, &maxCol);
 		isin(1, i) = double(maxCol);
 		//IF the query patch is highly correlated with any negative patch in the model THEN it is considered to be one of them
-		if ((nccN.array() > tld.model->ncc_thesame).any())
+		if ((nccN.array() > tld.model.ncc_thesame).any())
 			isin(2, i) = 1;
 		//measure Relative Similarity
 		dN = 1 - nccN.maxCoeff();
@@ -81,7 +81,7 @@ Eigen::Matrix<double, 3, Eigen::Dynamic> tldNN(Eigen::Matrix<double, PATCHSIZE
 		//measure Conservative Similarity
 		double
 				maxP =
-						nccP.block(0, 0, 1, ceil(tld.model->valid * tld.npex)).maxCoeff();
+						nccP.block(0, 0, 1, ceil(tld.model.valid * tld.npex)).maxCoeff();
 		dP = 1 - maxP;
 		conf2(0, i) = dN / (dN + dP);
 	}

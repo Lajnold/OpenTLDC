@@ -32,12 +32,12 @@ bool tldProcessFrame(TldStruct& tld, unsigned long i) {
 
 	tld.prevImg = tld.currentImg;
 
-	if(!tld.cfg->imgsource->nextImage())
+	if(!tld.cfg.imgsource->nextImage())
 		return false;
 
 	//Input image
 	ImgType im0;
-	im0.input = tld.cfg->imgsource->getGrayImage();
+	im0.input = tld.cfg.imgsource->getGrayImage();
 
 	//Blurred image
 	im0.blur = img_blur(im0.input);

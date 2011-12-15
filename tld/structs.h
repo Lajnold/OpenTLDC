@@ -39,13 +39,6 @@
 
 #include "../img/ImageSource.h"
 
-// Initial Configuration
-typedef struct {
-	Eigen::Vector4d init;
-	unsigned int nodisplay;
-        ImageSource *imgsource;
-} Config;
-
 // Plot
 typedef struct {
 	unsigned int save;
@@ -58,6 +51,14 @@ typedef struct {
 	unsigned int drawoutput;
 	double patch_rescale;
 } Plot;
+
+// Configuration
+typedef struct {
+	ImageSource *imgsource;
+	Eigen::Vector4d initBB;
+	Plot plot;
+} Config;
+
 
 // Blured image and input image (grayscale)
 typedef struct {
@@ -125,9 +126,8 @@ typedef struct {
 
 // Structure of TLD
 typedef struct {
-	Plot* plot;
-	Model* model;
-	Config* cfg;
+	Model model;
+	Config cfg;
 	Tmp tmp;
 	p_par p_par_init;
 	p_par p_par_update;

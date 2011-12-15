@@ -48,7 +48,7 @@ void tldDisplay(int i, unsigned long index, TldStruct& tld, double fps) {
 		// draw bounding box
 		bb_draw_add_color(inputClone, tld.currentBB);
 
-		tld.handle = CvImage(inputClone.size(), tld.cfg->imgsource->getImage().depth(), 3);
+		tld.handle = CvImage(inputClone.size(), tld.cfg.imgsource->getImage().depth(), 3);
 
 		cvCvtColor(inputClone, tld.handle, CV_GRAY2BGR);
 
@@ -60,11 +60,11 @@ void tldDisplay(int i, unsigned long index, TldStruct& tld, double fps) {
 	} else {
 
 		// show positive patches
-		if (tld.plot->pex == 1)
+		if (tld.cfg.plot.pex == 1)
 			embedPex(inputClone, tld);
 
 		// show negative patches
-		if (tld.plot->nex == 1)
+		if (tld.cfg.plot.nex == 1)
 			embedNex(inputClone, tld);
 
 		CvFont font;
@@ -73,8 +73,7 @@ void tldDisplay(int i, unsigned long index, TldStruct& tld, double fps) {
 		fpsc << fps;
 		cvInitFont(&font, CV_FONT_HERSHEY_SIMPLEX, 1.0, 1.0, 0, 1, CV_AA);
 
-
-		tld.handle = CvImage(inputClone.size(), tld.cfg->imgsource->getImage().depth(), 3);
+		tld.handle = CvImage(inputClone.size(), tld.cfg.imgsource->getImage().depth(), 3);
 		cvCvtColor(inputClone, tld.handle, CV_GRAY2BGR); // colored output image
 
 		// put fps
@@ -84,7 +83,7 @@ void tldDisplay(int i, unsigned long index, TldStruct& tld, double fps) {
 		unsigned char size = 100;
 
 		// show current target (not tested)
-		if (tld.plot->target == 1) {
+		if (tld.cfg.plot.target == 1) {
 
 			Eigen::Vector2d vecin;
 			vecin << 4, 4;
@@ -106,7 +105,7 @@ void tldDisplay(int i, unsigned long index, TldStruct& tld, double fps) {
 		}
 
 		// Replace
-		if (tld.plot->replace == 1) {
+		if (tld.cfg.plot.replace == 1) {
 
 			Eigen::Vector4d bb;
 			bb(0) = floor(tld.currentBB(0) + 0.5);
@@ -150,7 +149,7 @@ void tldDisplay(int i, unsigned long index, TldStruct& tld, double fps) {
 		vecin << 1.2, 1.2;
 
 		if (!isnan(bb(0))) {
-			switch (tld.plot->drawoutput) {
+			switch (tld.cfg.plot.drawoutput) {
 			case 1:
 				bb = bb_rescalerel(bb_square(bb), vecin); // scale 1.2
 				bb_draw(tld.handle, bb, color, linewidth);
@@ -176,13 +175,13 @@ void tldDisplay(int i, unsigned long index, TldStruct& tld, double fps) {
 void embedPex(CvImage img, TldStruct& tld) {
 
 
-	double rescale = tld.plot->patch_rescale;
+	double rescale = tld.cfg.plot.patch_rescale;
 
 	// measure number of possible rows of patches
-	int nrow = floor(tld.currentImg.input.height() / (rescale * tld.model->patchsize.x));
+	int nrow = floor(tld.currentImg.input.height() / (rescale * tld.model.patchsize.x));
 
 	// measure number of possible columns of patches
-	int ncol = floor(tld.currentImg.input.width() / (rescale * tld.model->patchsize.y));
+	int ncol = floor(tld.currentImg.input.width() / (rescale * tld.model.patchsize.y));
 
 	// get prepared Eigen Matrix
 	Eigen::MatrixXd pex;
@@ -212,13 +211,13 @@ void embedPex(CvImage img, TldStruct& tld) {
  */
 void embedNex(CvImage img, TldStruct& tld) {
 
-	double rescale = tld.plot->patch_rescale;
+	double rescale = tld.cfg.plot.patch_rescale;
 
 	// measure number of possible rows of patches
-	int nrow = floor(tld.currentImg.input.height() / (rescale * tld.model->patchsize.x));
+	int nrow = floor(tld.currentImg.input.height() / (rescale * tld.model.patchsize.x));
 
 	// measure number of possible columns of patches
-	int ncol = floor(tld.currentImg.input.width() / (rescale * tld.model->patchsize.y));
+	int ncol = floor(tld.currentImg.input.width() / (rescale * tld.model.patchsize.y));
 
 	// get prepared Eigen Matrix
 	Eigen::MatrixXd nex;

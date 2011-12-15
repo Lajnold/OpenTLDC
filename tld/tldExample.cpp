@@ -23,8 +23,6 @@
 
 #include "tld.h"
 
-// Instance of tracking learning detection structures
-TldStruct tld;
 
 /**
  *  Loop function of TLDC.
@@ -32,21 +30,18 @@ TldStruct tld;
  *  @param opt tld structure with initial values and thresholds
  *  @param cfg stream settings and initial bounding box
  */
-void tldExample(TldStruct* opt, Config& cfg) {
+void tldExample(TldStruct& tld, bool display) {
 
 	srand(0);
 
 	double t = (double)getTickCount();
-
-	tld = *opt;
-	tld.cfg = &cfg;
 
 	/* INITIALIZATION -------------------------------------- */
 
 	if(!tldInit(tld))
 		return; // No images.
 
-	if (!cfg.nodisplay)
+	if(display)
 		tldDisplay(0, 0, tld, t);
 
 	/* RUN-TIME -------------------------------------------- */
@@ -62,7 +57,7 @@ void tldExample(TldStruct* opt, Config& cfg) {
 
 		t = ((double)getTickCount() - t)/getTickFrequency();
 
-		if (!cfg.nodisplay)
+		if (display)
 			tldDisplay(1, i, tld, t);
 
 		std::cout << "BB - xmin: " << tld.currentBB(0) << " ymin: "
@@ -73,6 +68,6 @@ void tldExample(TldStruct* opt, Config& cfg) {
 
 	}
 
-	if(!cfg.nodisplay)
+	if(display)
 		cvDestroyWindow("Result");
 }

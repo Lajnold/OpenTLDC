@@ -40,7 +40,7 @@ void tldLearning(TldStruct& tld, unsigned long I) {
 	ImgType img = tld.currentImg;
 
 	// get pattern of current bbox
-	Eigen::MatrixXd pPatt = tldGetPattern(img, bb, tld.model->patchsize, 0);
+	Eigen::MatrixXd pPatt = tldGetPattern(img, bb, tld.model.patchsize, 0);
 
 	// measure nearest neighbor
 	Eigen::MatrixXd nn = tldNN(pPatt, tld);
@@ -119,7 +119,7 @@ void tldLearning(TldStruct& tld, unsigned long I) {
 	Eigen::VectorXd dummy(1);
 	dummy(0) = -1;
 
-	fern2(X, Y, tld.model->thr_fern, 2, dummy);
+	fern2(X, Y, tld.model.thr_fern, 2, dummy);
 
 	// update nearest neighbour
 	tldTrainNN(pEx, nEx, tld);

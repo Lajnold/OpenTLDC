@@ -77,7 +77,7 @@ void tldTrainNN(
 		Eigen::MatrixXd conf(3, 3);
 		conf = tldNN(x2.col(i), tld);
 		//Positive
-		if (y2(i) == 1 && conf(0, 0) <= tld.model->thr_nn && tld.npex < MAXPATCHES) {
+		if (y2(i) == 1 && conf(0, 0) <= tld.model.thr_nn && tld.npex < MAXPATCHES) {
 			if (isnan(conf(1, 2))) {
 				tld.npex = 1;
 				tld.pex.col(0) = x2.col(i);

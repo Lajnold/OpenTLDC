@@ -39,23 +39,22 @@ bool tldInit(TldStruct& tld) {
 	lkInit();
 
 	// Get initial image
-	if(!tld.cfg->imgsource->nextImage())
+	if(!tld.cfg.imgsource->nextImage())
 		return false;
 
-	tld.currentImg.input = tld.cfg->imgsource->getGrayImage();
+	tld.currentImg.input = tld.cfg.imgsource->getGrayImage();
 	tld.currentImg.blur = img_blur(tld.currentImg.input);
 
 	// get initial bounding box
-	Eigen::Vector4d bb;
-	bb = tld.cfg->init;
+	Eigen::Vector4d bb = tld.cfg.initBB;
 
 	Eigen::Vector2i imsize;
 	imsize(0) = tld.currentImg.input.width();
 	imsize(1) = tld.currentImg.input.height();
-	bb_scan(tld, bb, imsize, tld.model->min_win);
+	bb_scan(tld, bb, imsize, tld.model.min_win);
 
 	// Features
-	tldGenerateFeatures(tld, tld.model->num_trees, tld.model->num_features);
+	tldGenerateFeatures(tld, tld.model.num_trees, tld.model.num_features);
 
 	// Initialize Detector
 	fern0();
@@ -66,7 +65,7 @@ bool tldInit(TldStruct& tld) {
 	// Temporal structures
 	Tmp temporal;
 	temporal.conf = Eigen::VectorXd::Zero(tld.nGrid);
-	temporal.patt = Eigen::Matrix<double, 10, Eigen::Dynamic>::Zero(tld.model->num_trees, tld.nGrid);
+	temporal.patt = Eigen::Matrix<double, 10, Eigen::Dynamic>::Zero(tld.model.num_trees, tld.nGrid);
 	tld.tmp = temporal;
 
 	// RESULTS =================================================================
@@ -128,14 +127,14 @@ bool tldInit(TldStruct& tld) {
 	unsigned char bootstrap = 2;
 	Eigen::VectorXd dummy(1);
 	dummy(0) = -1;
-	fern2(permX, permY, tld.model->thr_fern, bootstrap, dummy);
+	fern2(permX, permY, tld.model.thr_fern, bootstrap, dummy);
 
 	// Nearest Neighbour
 	tld.npex = 0;
 	tld.nnex = 0;
 
 	tldTrainNN(pEx, spnEx.leftCols(spnEx.cols() / 2), tld);
-	tld.model->num_init = tld.npex;
+	tld.model.num_init = tld.npex;
 
 	// Estimate thresholds on validation set  ----------------------------------
 
@@ -145,17 +144,17 @@ bool tldInit(TldStruct& tld) {
 	Eigen::Matrix<double, 10, Eigen::Dynamic> fernin(10, ferninsize);
 	fernin.leftCols(ferninsize) = spnX.rightCols(ferninsize);
 	conf_fern = fern3(fernin, ferninsize);
-	tld.model->thr_fern = std::max(conf_fern.maxCoeff() / tld.model->num_trees,
-			tld.model->thr_fern);
+	tld.model.thr_fern = std::max(conf_fern.maxCoeff() / tld.model.num_trees,
+			tld.model.thr_fern);
 
 	// Nearest neighbor
 	Eigen::MatrixXd conf_nn(3, 3);
 	conf_nn = tldNN(spnEx.rightCols(spnEx.cols() / 2), tld);
 
-	tld.model->thr_nn = std::max(tld.model->thr_nn, conf_nn.block(0, 0, 1,
+	tld.model.thr_nn = std::max(tld.model.thr_nn, conf_nn.block(0, 0, 1,
 			conf_nn.cols() / 3).maxCoeff());
-	tld.model->thr_nn_valid = std::max(tld.model->thr_nn_valid,
-			tld.model->thr_nn);
+	tld.model.thr_nn_valid = std::max(tld.model.thr_nn_valid,
+			tld.model.thr_nn);
 
 	return true;
 }

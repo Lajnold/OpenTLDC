@@ -36,7 +36,7 @@ using namespace cv;
 #define PI 3.14159265358979L
 
 /* Main Loop */
-void tldExample(TldStruct* opt, Config& cfg);
+void tldExample(TldStruct& tld, bool display);
 
 /* Shows Results in additional window */
 void tldDisplay(int i, unsigned long index, TldStruct& tld, double fps);

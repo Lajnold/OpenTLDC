@@ -72,7 +72,7 @@ Eigen::Matrix<double, 20, 1> tldDetection(TldStruct& tld, int i, Eigen::Matrix<
 	// get indexes of bounding boxes that passed through the Ensemble Classifier
 	std::vector<int> idx_dt;
 	for (int j = 0; j < tld.tmp.conf.size(); j++) {
-		if (tld.tmp.conf(j) > tld.model->num_trees * tld.model->thr_fern)
+		if (tld.tmp.conf(j) > tld.model.num_trees * tld.model.thr_fern)
 			idx_dt.push_back(j);
 	}
 
@@ -109,12 +109,12 @@ Eigen::Matrix<double, 20, 1> tldDetection(TldStruct& tld, int i, Eigen::Matrix<
 
 		Eigen::Matrix<double, (PATCHSIZE * PATCHSIZE), 1> ex =
 				tldGetPattern(tld.currentImg, dt.bb.col(j),
-						tld.model->patchsize, 0); // measure patch
+						tld.model.patchsize, 0); // measure patch
 
 		Eigen::MatrixXd result = tldNN(ex, tld); // evaluate nearest neighbour classifier
 
 		// fill detection structure
-		if (result(0, 0) > tld.model->thr_nn)
+		if (result(0, 0) > tld.model.thr_nn)
 			idxcopy.push_back(j);
 		dt.conf2(j) = result(0, 1);
 		dt.patch.col(j) = ex;
