@@ -21,15 +21,11 @@
  *
  */
 
-#include "stdio.h"
-#include "math.h"
-#include <vector>
+#include <cmath>
+#include <cstdio>
 #include <map>
 #include <set>
-//#include "tld.h"
-#ifdef _CHAR16T
-#define CHAR16_T
-#endif
+#include <vector>
 
 #include "mex.h"
 #include "../utils/utility.h"
@@ -51,9 +47,9 @@ static PT *BBOX = NULL;
 static PT *OFF = NULL;
 static double *IIMG = 0;
 static double *IIMG2 = 0;
-static vector<vector<double> > WEIGHT;
-static vector<vector<int> > nP;
-static vector<vector<int> > nN;
+static std::vector<std::vector<double> > WEIGHT;
+static std::vector<std::vector<int> > nP;
+static std::vector<std::vector<int> > nN;
 static int BBOX_STEP = 7;
 static int nBIT = 1; // number of bits per feature
 
@@ -315,9 +311,9 @@ void fern1(IplImage* source,
 	OFF = create_offsets(scales, features);
 
 	for (int i = 0; i < nTREES; i++) {
-		WEIGHT.push_back(vector<double> (pow(2.0, nBIT * nFEAT), 0));
-		nP.push_back(vector<int> (pow(2.0, nBIT * nFEAT), 0));
-		nN.push_back(vector<int> (pow(2.0, nBIT * nFEAT), 0));
+		WEIGHT.push_back(std::vector<double> (pow(2.0, nBIT * nFEAT), 0));
+		nP.push_back(std::vector<int> (pow(2.0, nBIT * nFEAT), 0));
+		nN.push_back(std::vector<int> (pow(2.0, nBIT * nFEAT), 0));
 	}
 
 	for (int i = 0; i < nTREES; i++) {
@@ -431,8 +427,7 @@ void fern4(ImgType& img, double maxBBox, double minVar, Eigen::VectorXd& conf,
 
 }
 
-Eigen::Matrix<double, TLD_NTREES, Eigen::Dynamic> fern5(ImgType& img, std::vector<
-		int>& idx, double var) {
+Eigen::Matrix<double, TLD_NTREES, Eigen::Dynamic> fern5(ImgType& img, std::vector<int>& idx, double var) {
 
 	// bbox indexes
 	int numIdx = idx.size();
