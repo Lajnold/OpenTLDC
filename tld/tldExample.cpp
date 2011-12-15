@@ -21,6 +21,8 @@
  *
  */
 
+#include <iostream>
+
 #include "tld.h"
 
 
@@ -34,7 +36,7 @@ void tldExample(TldStruct& tld, bool display) {
 
 	srand(0);
 
-	double t = (double)getTickCount();
+	double t = (double)cv::getTickCount();
 
 	/* INITIALIZATION -------------------------------------- */
 
@@ -50,12 +52,12 @@ void tldExample(TldStruct& tld, bool display) {
 
 	while (i < 2500) {
 
-		t = (double)getTickCount();
+		t = (double)cv::getTickCount();
 
 		if(!tldProcessFrame(tld, i))
 			break; // Out of images.
 
-		t = ((double)getTickCount() - t)/getTickFrequency();
+		t = ((double)cv::getTickCount() - t)/cv::getTickFrequency();
 
 		if (display)
 			tldDisplay(1, i, tld, t);
