@@ -285,7 +285,7 @@ void tldDisplay(int i, unsigned long index, TldStruct& tld, double fps) {
 		cvNamedWindow("Result", CV_WINDOW_AUTOSIZE);
 
 		cvShowImage("Result", tld.handle);
-		if (waitKey(10) >= 0)
+		if (cv::waitKey(10) >= 0)
 			std::cout << "key pressed" << std::endl;
 	} else {
 
@@ -390,7 +390,7 @@ void tldDisplay(int i, unsigned long index, TldStruct& tld, double fps) {
 		}
 
 		cvShowImage("Result", tld.handle);
-		if (waitKey(10) >= 0)
+		if (cv::waitKey(10) >= 0)
 			std::cout << "key pressed" << std::endl;
 
 	}
