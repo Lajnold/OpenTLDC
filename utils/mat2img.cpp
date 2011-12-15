@@ -24,7 +24,7 @@
 #include "utility.h"
 
 
-Eigen::MatrixXd mat2img(Eigen::Matrix<double, (PATCHSIZE * PATCHSIZE),
+Eigen::MatrixXd mat2img(Eigen::Matrix<double, (TLD_PATCHSIZE * TLD_PATCHSIZE),
 		Eigen::Dynamic> const & data, int n, unsigned int nrow) {
 
 	double result_1 = sqrt(data.rows());

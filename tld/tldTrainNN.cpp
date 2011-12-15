@@ -26,8 +26,8 @@
 #include <limits>
 /*Trains nearest neighbor*/
 void tldTrainNN(
-		Eigen::Matrix<double, PATCHSIZE * PATCHSIZE, Eigen::Dynamic> const & pEx,
-		Eigen::Matrix<double, PATCHSIZE * PATCHSIZE, Eigen::Dynamic> const & nEx1,
+		Eigen::Matrix<double, TLD_PATCHSIZE * TLD_PATCHSIZE, Eigen::Dynamic> const & pEx,
+		Eigen::Matrix<double, TLD_PATCHSIZE * TLD_PATCHSIZE, Eigen::Dynamic> const & nEx1,
 		TldStruct& tld) {
 
 	unsigned int nP = pEx.cols(); //number of positive examples
@@ -77,7 +77,7 @@ void tldTrainNN(
 		Eigen::MatrixXd conf(3, 3);
 		conf = tldNN(x2.col(i), tld);
 		//Positive
-		if (y2(i) == 1 && conf(0, 0) <= tld.model.thr_nn && tld.npex < MAXPATCHES) {
+		if (y2(i) == 1 && conf(0, 0) <= tld.model.thr_nn && tld.npex < TLD_MAXPATCHES) {
 			if (isnan(conf(1, 2))) {
 				tld.npex = 1;
 				tld.pex.col(0) = x2.col(i);
@@ -94,7 +94,7 @@ void tldTrainNN(
 			if (pex2.cols() > 0) {
 				tld.pex.leftCols(conf(1, 2) + 1) = pex1;
 				tld.pex.col(conf(1, 2) + 1) = x2.col(i);
-				tld.pex.block(0, conf(1, 2) + 2, (PATCHSIZE * PATCHSIZE),
+				tld.pex.block(0, conf(1, 2) + 2, (TLD_PATCHSIZE * TLD_PATCHSIZE),
 						pex2.cols()) = pex2;
 			} else {
 				tld.pex.leftCols(conf(1, 2) + 1) = pex1;
@@ -105,7 +105,7 @@ void tldTrainNN(
 
 		//
 		//Negative
-		if (y2(i) == 0 && conf(0, 0) > 0.5 && tld.nnex < MAXPATCHES) {
+		if (y2(i) == 0 && conf(0, 0) > 0.5 && tld.nnex < TLD_MAXPATCHES) {
 			tld.nex.col(tld.nnex) = x2.col(i);
 			tld.nnex++;
 		}

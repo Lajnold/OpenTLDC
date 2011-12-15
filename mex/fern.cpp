@@ -188,7 +188,7 @@ PT* create_offsets_bbox(
 }
 
 PT* create_offsets(Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> scale,
-		Eigen::Matrix<double, 4 * NFEATURES, NTREES> x) {
+		Eigen::Matrix<double, 4 * TLD_NFEATURES, TLD_NTREES> x) {
 
 
 	PT *offsets = (PT*) malloc(nSCALE * nTREES * nFEAT * 2 * sizeof(PT));
@@ -295,7 +295,7 @@ void fern0() {
  */
 void fern1(IplImage* source,
 		Eigen::Matrix<double, 6, Eigen::Dynamic> const & grid, Eigen::Matrix<
-				double, 4 * NFEATURES, NTREES> const & features, Eigen::Matrix<
+				double, 4 * TLD_NFEATURES, TLD_NTREES> const & features, Eigen::Matrix<
 				double, 2, 21> const & scales) {
 
 	iHEIGHT = source->height;
@@ -431,7 +431,7 @@ void fern4(ImgType& img, double maxBBox, double minVar, Eigen::VectorXd& conf,
 
 }
 
-Eigen::Matrix<double, NTREES, Eigen::Dynamic> fern5(ImgType& img, std::vector<
+Eigen::Matrix<double, TLD_NTREES, Eigen::Dynamic> fern5(ImgType& img, std::vector<
 		int>& idx, double var) {
 
 	// bbox indexes

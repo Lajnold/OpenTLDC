@@ -29,12 +29,13 @@
 #include <vector>
 #include <math.h>
 #include <Eigen/Core>
-#include "../tld/structs.h"
 
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
 
-Eigen::MatrixXd mat2img(Eigen::Matrix<double, (PATCHSIZE * PATCHSIZE),
+#include "../tld/tldconst.h"
+
+Eigen::MatrixXd mat2img(Eigen::Matrix<double, (TLD_PATCHSIZE * TLD_PATCHSIZE),
 		Eigen::Dynamic> const & data, int n, unsigned int nrow);
 
 inline double uniform() {

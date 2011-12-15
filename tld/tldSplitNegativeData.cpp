@@ -25,10 +25,10 @@
 #include "../utils/utility.h"
 /*Splits negative data to training and validation set*/
 void tldSplitNegativeData(
-		Eigen::Matrix<double, NTREES, Eigen::Dynamic> const & nX,
-		Eigen::Matrix<double, PATCHSIZE * PATCHSIZE, Eigen::Dynamic> const & nEx,
-		Eigen::Matrix<double, NTREES, Eigen::Dynamic>& spnX,
-		Eigen::Matrix<double, PATCHSIZE * PATCHSIZE, Eigen::Dynamic>& spnEx) {
+		Eigen::Matrix<double, TLD_NTREES, Eigen::Dynamic> const & nX,
+		Eigen::Matrix<double, TLD_PATCHSIZE * TLD_PATCHSIZE, Eigen::Dynamic> const & nEx,
+		Eigen::Matrix<double, TLD_NTREES, Eigen::Dynamic>& spnX,
+		Eigen::Matrix<double, TLD_PATCHSIZE * TLD_PATCHSIZE, Eigen::Dynamic>& spnEx) {
 
 	unsigned int N = nX.cols();
 	Eigen::RowVectorXd Nvec(N);

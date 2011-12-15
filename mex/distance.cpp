@@ -37,8 +37,8 @@ double ccorr(Eigen::Matrix<double, Eigen::Dynamic, 1> const & f1,
 }
 
 // correlation normalized
-double ccorr_normed(Eigen::Matrix<double, (PATCHSIZE * PATCHSIZE), 1> const & f1,
-		Eigen::Matrix<double, (PATCHSIZE * PATCHSIZE), 1> const & f2, int numDim) {
+double ccorr_normed(Eigen::Matrix<double, (TLD_PATCHSIZE * TLD_PATCHSIZE), 1> const & f1,
+		Eigen::Matrix<double, (TLD_PATCHSIZE * TLD_PATCHSIZE), 1> const & f2, int numDim) {
 	double corr = 0;
 	double norm1 = 0;
 	double norm2 = 0;
@@ -53,8 +53,8 @@ double ccorr_normed(Eigen::Matrix<double, (PATCHSIZE * PATCHSIZE), 1> const & f1
 }
 
 // euclidean distance
-double euclidean(Eigen::Matrix<double, (PATCHSIZE * PATCHSIZE), 1> const & f1,
-		Eigen::Matrix<double, (PATCHSIZE * PATCHSIZE), 1> const & f2, int numDim) {
+double euclidean(Eigen::Matrix<double, (TLD_PATCHSIZE * TLD_PATCHSIZE), 1> const & f1,
+		Eigen::Matrix<double, (TLD_PATCHSIZE * TLD_PATCHSIZE), 1> const & f2, int numDim) {
 
 	double sum = 0;
 	for (int i = 0; i < numDim; i++) {
@@ -64,8 +64,8 @@ double euclidean(Eigen::Matrix<double, (PATCHSIZE * PATCHSIZE), 1> const & f1,
 }
 
 Eigen::MatrixXd distance(
-		Eigen::Matrix<double, (PATCHSIZE * PATCHSIZE), 1> const &x1,
-		Eigen::Matrix<double, (PATCHSIZE * PATCHSIZE), MAXPATCHES> const &x2,
+		Eigen::Matrix<double, (TLD_PATCHSIZE * TLD_PATCHSIZE), 1> const &x1,
+		Eigen::Matrix<double, (TLD_PATCHSIZE * TLD_PATCHSIZE), TLD_MAXPATCHES> const &x2,
 		int nx2, unsigned int flag) {
 
 	unsigned int N1 = x1.cols();

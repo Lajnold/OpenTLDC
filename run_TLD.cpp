@@ -114,12 +114,12 @@ int main(int argc, char* argv[]) {
 	tld.cfg.plot.drawoutput = 3;
 	tld.cfg.plot.confidence = 1;
 
-	tld.model.num_trees = NTREES;
-	tld.model.num_features = NFEATURES;
+	tld.model.num_trees = TLD_NTREES;
+	tld.model.num_features = TLD_NFEATURES;
 
 	Patchsize patchsize;
-	patchsize.x = PATCHSIZE;
-	patchsize.y = PATCHSIZE;
+	patchsize.x = TLD_PATCHSIZE;
+	patchsize.y = TLD_PATCHSIZE;
 	tld.model.patchsize = patchsize;
 	tld.model.min_win = 24;
 	tld.model.fliplr = 0; // mirrored versions of object

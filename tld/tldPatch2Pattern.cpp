@@ -23,7 +23,7 @@
 
 #include "tld.h"
 /* Converts an image to Eigen Matrix */
-Eigen::Matrix<double, PATCHSIZE * PATCHSIZE, 1> tldPatch2Pattern(CvImage patch,
+Eigen::Matrix<double, TLD_PATCHSIZE * TLD_PATCHSIZE, 1> tldPatch2Pattern(CvImage patch,
 		Patchsize const& patchsize) {
 
 	CvImage dest = CvImage(

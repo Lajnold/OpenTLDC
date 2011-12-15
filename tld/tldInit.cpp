@@ -86,20 +86,20 @@ bool tldInit(TldStruct& tld) {
 	tld.target = img_patch(tld.currentImg.input, tld.currentBB);
 
 	// Generate Positive Examples
-	Eigen::Matrix<double, NTREES, Eigen::Dynamic> pX; // pX: 10 rows
-	Eigen::Matrix<double, (PATCHSIZE * PATCHSIZE), Eigen::Dynamic> pEx;
+	Eigen::Matrix<double, TLD_NTREES, Eigen::Dynamic> pX; // pX: 10 rows
+	Eigen::Matrix<double, (TLD_PATCHSIZE * TLD_PATCHSIZE), Eigen::Dynamic> pEx;
 	tld.currentBB = tldGeneratePositiveData(tld, overlap, tld.currentImg,
 			tld.p_par_init, pX, pEx);
 
 	Eigen::MatrixXd pY = Eigen::MatrixXd::Ones(1, pX.cols());
 	// Generate Negative Examples
-	Eigen::Matrix<double, NTREES, Eigen::Dynamic> nX; // nX: 10 rows
-	Eigen::Matrix<double, (PATCHSIZE * PATCHSIZE), Eigen::Dynamic> nEx;
+	Eigen::Matrix<double, TLD_NTREES, Eigen::Dynamic> nX; // nX: 10 rows
+	Eigen::Matrix<double, (TLD_PATCHSIZE * TLD_PATCHSIZE), Eigen::Dynamic> nEx;
 	tldGenerateNegativeData(tld, overlap, tld.currentImg, nX, nEx);
 
 	// Split Negative Data to Training set and Validation set
-	Eigen::Matrix<double, NTREES, Eigen::Dynamic> spnX;
-	Eigen::Matrix<double, (PATCHSIZE * PATCHSIZE), Eigen::Dynamic> spnEx;
+	Eigen::Matrix<double, TLD_NTREES, Eigen::Dynamic> spnX;
+	Eigen::Matrix<double, (TLD_PATCHSIZE * TLD_PATCHSIZE), Eigen::Dynamic> spnEx;
 	tldSplitNegativeData(nX, nEx, spnX, spnEx);
 
 	Eigen::MatrixXd nY1 = Eigen::MatrixXd::Zero(1, spnX.cols() / 2);

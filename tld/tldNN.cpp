@@ -25,8 +25,8 @@
 #include <limits>
 #include "../mex/mex.h"
 /* Classifies examples as positive or negative */
-Eigen::Matrix<double, 3, Eigen::Dynamic> tldNN(Eigen::Matrix<double, PATCHSIZE
-		* PATCHSIZE, Eigen::Dynamic> const & nEx2, TldStruct& tld) {
+Eigen::Matrix<double, 3, Eigen::Dynamic> tldNN(Eigen::Matrix<double, TLD_PATCHSIZE
+		* TLD_PATCHSIZE, Eigen::Dynamic> const & nEx2, TldStruct& tld) {
 	//	function [conf1,conf2,isin] = tldNN(x,tld)
 	//'conf1' ... full model (Relative Similarity)
 	//'conf2' ... validated part of model (Conservative Similarity)

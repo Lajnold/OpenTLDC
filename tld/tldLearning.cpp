@@ -73,8 +73,8 @@ void tldLearning(TldStruct& tld, unsigned long I) {
 
 	// generate positive examples from all bounding boxes that are highly
 	// overlapping with current bounding box
-	Eigen::Matrix<double, NTREES, Eigen::Dynamic> pX; // pX: 10 rows
-	Eigen::Matrix<double, (PATCHSIZE * PATCHSIZE), Eigen::Dynamic> pEx;
+	Eigen::Matrix<double, TLD_NTREES, Eigen::Dynamic> pX; // pX: 10 rows
+	Eigen::Matrix<double, (TLD_PATCHSIZE * TLD_PATCHSIZE), Eigen::Dynamic> pEx;
 	Eigen::Vector4d ret = tldGeneratePositiveData(tld, overlap, img,
 			tld.p_par_update, pX, pEx);
 

@@ -37,7 +37,7 @@ Eigen::Matrix<double, 4, 150> lk2(IplImage* imgI, IplImage* imgJ,
 void fern0();
 void fern1(IplImage* source,
 		Eigen::Matrix<double, 6, Eigen::Dynamic> const & grid, Eigen::Matrix<
-				double, 4 * NFEATURES, NTREES> const & features, Eigen::Matrix<
+				double, 4 * TLD_NFEATURES, TLD_NTREES> const & features, Eigen::Matrix<
 				double, 2, 21> const & scales);
 
 Eigen::RowVectorXd fern2(Eigen::Matrix<double, 10, Eigen::Dynamic> const & X,
@@ -49,12 +49,12 @@ Eigen::RowVectorXd fern3(Eigen::Matrix<double, 10, Eigen::Dynamic> const & nX2, 
 void fern4(ImgType& img, double maxBBox, double minVar, Eigen::VectorXd& conf,
 		Eigen::Matrix<double, 10, Eigen::Dynamic>& patt);
 
-Eigen::Matrix<double, NTREES, Eigen::Dynamic> fern5(ImgType& img, std::vector<
+Eigen::Matrix<double, TLD_NTREES, Eigen::Dynamic> fern5(ImgType& img, std::vector<
 		int>& idx, double var);
 
 Eigen::MatrixXd
-distance(Eigen::Matrix<double, (PATCHSIZE * PATCHSIZE), 1> const &x1,
-		Eigen::Matrix<double, (PATCHSIZE * PATCHSIZE), MAXPATCHES> const &x2,
+distance(Eigen::Matrix<double, (TLD_PATCHSIZE * TLD_PATCHSIZE), 1> const &x1,
+		Eigen::Matrix<double, (TLD_PATCHSIZE * TLD_PATCHSIZE), TLD_MAXPATCHES> const &x2,
 		int nx2, unsigned int flag);
 
 IplImage* warp(IplImage* img, Eigen::Matrix3d const & H,

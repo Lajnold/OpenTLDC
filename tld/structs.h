@@ -24,12 +24,6 @@
 #ifndef STRUCTS_H_
 #define STRUCTS_H_
 
-#define NFEATURES 13 // Features per tree
-#define NTREES 10 // number of trees
-#define PATCHSIZE 15 // 15 x 15
-#define MAXPATCHES 100
-#define MAXDT 100
-
 #include <opencv/cv.h>
 #include <opencv/cvaux.h>
 #include <opencv/highgui.h>
@@ -37,6 +31,7 @@
 #include <Eigen/Dense>
 #include <Eigen/Core>
 
+#include "tldconst.h"
 #include "../img/ImageSource.h"
 
 // Plot
@@ -118,10 +113,10 @@ struct Control {
 };
 
 struct Detection {
-	Eigen::Matrix<double, 4, MAXDT> bb;
+	Eigen::Matrix<double, 4, TLD_MAXDT> bb;
 	int nbb;
-	Eigen::Matrix<double, MAXDT, 1> conf2;
-	Eigen::Matrix<double, (PATCHSIZE * PATCHSIZE), MAXDT> patch;
+	Eigen::Matrix<double, TLD_MAXDT, 1> conf2;
+	Eigen::Matrix<double, (TLD_PATCHSIZE * TLD_PATCHSIZE), TLD_MAXDT> patch;
 };
 
 // Structure of TLD
@@ -135,7 +130,7 @@ struct TldStruct {
 	Tracker tracker;
 	Control control;
 
-	Eigen::Matrix<double, 4 * NFEATURES, NTREES> features;
+	Eigen::Matrix<double, 4 * TLD_NFEATURES, TLD_NTREES> features;
 	int nGrid;
 
 	Eigen::Matrix<double, 6, Eigen::Dynamic> grid;
@@ -156,8 +151,8 @@ struct TldStruct {
 	int npex;
 	int nnex;
 
-	Eigen::Matrix<double, (PATCHSIZE * PATCHSIZE), MAXPATCHES> pex;
-	Eigen::Matrix<double, (PATCHSIZE * PATCHSIZE), MAXPATCHES> nex;
+	Eigen::Matrix<double, (TLD_PATCHSIZE * TLD_PATCHSIZE), TLD_MAXPATCHES> pex;
+	Eigen::Matrix<double, (TLD_PATCHSIZE * TLD_PATCHSIZE), TLD_MAXPATCHES> nex;
 
 	//Eigen::MatrixXd xFJ;
 

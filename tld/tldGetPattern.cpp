@@ -35,7 +35,7 @@
  *
  * @return patterns
  */
-Eigen::Matrix<double, (PATCHSIZE * PATCHSIZE), Eigen::Dynamic> tldGetPattern(
+Eigen::Matrix<double, (TLD_PATCHSIZE * TLD_PATCHSIZE), Eigen::Dynamic> tldGetPattern(
 		ImgType& img, Eigen::Matrix<double, 4, Eigen::Dynamic> const & bb,
 		Patchsize& patchsize, unsigned int flip) {
 

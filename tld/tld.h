@@ -63,40 +63,40 @@ Eigen::VectorXd tldTracking(TldStruct& tld, Eigen::VectorXd const & bb, int i,
 /* duplicates slightly altered previous found positive patches */
 Eigen::Vector4d tldGeneratePositiveData(TldStruct& tld,
 		Eigen::MatrixXd const & overlap, ImgType& img, P_par& p_par,
-		Eigen::Matrix<double, NTREES, Eigen::Dynamic>& pX, Eigen::Matrix<
-				double, (PATCHSIZE * PATCHSIZE), Eigen::Dynamic>& pEx);
+		Eigen::Matrix<double, TLD_NTREES, Eigen::Dynamic>& pX, Eigen::Matrix<
+				double, (TLD_PATCHSIZE * TLD_PATCHSIZE), Eigen::Dynamic>& pEx);
 
 /* pickups bbox and converts to Eigen matrix */
-Eigen::Matrix<double, (PATCHSIZE * PATCHSIZE), Eigen::Dynamic> tldGetPattern(
+Eigen::Matrix<double, (TLD_PATCHSIZE * TLD_PATCHSIZE), Eigen::Dynamic> tldGetPattern(
 		ImgType& img, Eigen::Matrix<double, 4, Eigen::Dynamic> const & bb,
 		Patchsize& patchsize, unsigned int flip);
 
 /* generates initial some random negative patches */
 void tldGenerateNegativeData(TldStruct& tld,
 		Eigen::RowVectorXd const & overlap, ImgType& img, Eigen::Matrix<double,
-				NTREES, Eigen::Dynamic>& nX, Eigen::Matrix<double, (PATCHSIZE
-				* PATCHSIZE), Eigen::Dynamic>& nEx);
+				TLD_NTREES, Eigen::Dynamic>& nX, Eigen::Matrix<double, (TLD_PATCHSIZE
+				* TLD_PATCHSIZE), Eigen::Dynamic>& nEx);
 
 /* random permutation of generated negatives and splits it to validation and training set */
 void tldSplitNegativeData(
-				Eigen::Matrix<double, NTREES, Eigen::Dynamic> const & nX,
-				Eigen::Matrix<double, PATCHSIZE * PATCHSIZE, Eigen::Dynamic> const & nEx,
-				Eigen::Matrix<double, NTREES, Eigen::Dynamic>& spnX,
-				Eigen::Matrix<double, PATCHSIZE * PATCHSIZE, Eigen::Dynamic>& spnEx);
+				Eigen::Matrix<double, TLD_NTREES, Eigen::Dynamic> const & nX,
+				Eigen::Matrix<double, TLD_PATCHSIZE * TLD_PATCHSIZE, Eigen::Dynamic> const & nEx,
+				Eigen::Matrix<double, TLD_NTREES, Eigen::Dynamic>& spnX,
+				Eigen::Matrix<double, TLD_PATCHSIZE * TLD_PATCHSIZE, Eigen::Dynamic>& spnEx);
 
 /* Converts an image to Eigen Matrix */
-Eigen::Matrix<double, PATCHSIZE * PATCHSIZE, 1> tldPatch2Pattern(
+Eigen::Matrix<double, TLD_PATCHSIZE * TLD_PATCHSIZE, 1> tldPatch2Pattern(
 		CvImage patch, Patchsize const& patchsize);
 
 /* Trains nearest neighbor */
 void tldTrainNN(
-				Eigen::Matrix<double, PATCHSIZE * PATCHSIZE, Eigen::Dynamic> const & pEx,
-				Eigen::Matrix<double, PATCHSIZE * PATCHSIZE, Eigen::Dynamic> const & nEx1,
+				Eigen::Matrix<double, TLD_PATCHSIZE * TLD_PATCHSIZE, Eigen::Dynamic> const & pEx,
+				Eigen::Matrix<double, TLD_PATCHSIZE * TLD_PATCHSIZE, Eigen::Dynamic> const & nEx1,
 				TldStruct& tld);
 
 /* Classifies examples as positive or negative */
-Eigen::Matrix<double, 3, Eigen::Dynamic> tldNN(Eigen::Matrix<double, PATCHSIZE
-		* PATCHSIZE, Eigen::Dynamic> const & nEx2, TldStruct& tld);
+Eigen::Matrix<double, 3, Eigen::Dynamic> tldNN(Eigen::Matrix<double, TLD_PATCHSIZE
+		* TLD_PATCHSIZE, Eigen::Dynamic> const & nEx2, TldStruct& tld);
 
 /* Learns detected pattern */
 void tldLearning(TldStruct& tld, unsigned long I);

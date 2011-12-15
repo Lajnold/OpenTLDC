@@ -35,8 +35,8 @@
  */
 void tldGenerateNegativeData(TldStruct& tld,
 		Eigen::RowVectorXd const & overlap, ImgType& img, Eigen::Matrix<double,
-				NTREES, Eigen::Dynamic>& nX, Eigen::Matrix<double, (PATCHSIZE
-				* PATCHSIZE), Eigen::Dynamic>& nEx) {
+				TLD_NTREES, Eigen::Dynamic>& nX, Eigen::Matrix<double, (TLD_PATCHSIZE
+				* TLD_PATCHSIZE), Eigen::Dynamic>& nEx) {
 
 	// Measure patterns on all bboxes that are far from initial bbox
 	std::vector<int> idxN;
@@ -46,7 +46,7 @@ void tldGenerateNegativeData(TldStruct& tld,
 		}
 	}
 
-	Eigen::MatrixXd fernpat(NTREES, idxN.size() + 1);
+	Eigen::MatrixXd fernpat(TLD_NTREES, idxN.size() + 1);
 	fernpat = fern5(img, idxN, tld.var / 2);
 
 	// bboxes far and with big variance

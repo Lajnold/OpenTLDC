@@ -107,7 +107,7 @@ Eigen::Matrix<double, 20, 1> tldDetection(TldStruct& tld, int i, Eigen::Matrix<
 	for (int j = 0; j < num_dt; j++) {
 		dt.bb.col(j) = tld.grid.block(0, idx_dt[j], 4, 1);
 
-		Eigen::Matrix<double, (PATCHSIZE * PATCHSIZE), 1> ex =
+		Eigen::Matrix<double, (TLD_PATCHSIZE * TLD_PATCHSIZE), 1> ex =
 				tldGetPattern(tld.currentImg, dt.bb.col(j),
 						tld.model.patchsize, 0); // measure patch
 
