@@ -24,7 +24,11 @@
 #ifndef MEX_H_
 #define MEX_H_
 
-#include "../tld/tld.h"
+#include <Eigen/Core>
+#include <opencv/cv.h>
+#include <opencv/cvaux.h>
+
+#include "../tld/structs.h"
 
 /* lucas kanade */
 void lkInit();
