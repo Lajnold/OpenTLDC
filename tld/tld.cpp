@@ -414,7 +414,7 @@ bool tldInit(TldStruct& tld) {
 	tld.currentImg.blur = img_blur(tld.currentImg.input);
 
 	// get initial bounding box
-	Vector4d bb = tld.cfg.initBB;
+	Vector4d bb = tld.cfg.newBB;
 
 	Vector2i imsize;
 	imsize(0) = tld.currentImg.input.width();
@@ -1188,12 +1188,12 @@ bool tldProcessFrame(TldStruct& tld, unsigned long i) {
 				//tld.size = cluster(0, 2);
 				tld.currentValid = 0;
 			}
-	} else if (tld.hasNewBB) {
-		tld.currentBB = tld.newBB;
+	} else if (tld.cfg.newBBSet) {
+		tld.currentBB = tld.cfg.newBB;
 		tld.conf = 1;
 		//tld.size = ???
 		tld.currentValid = 1;
-		tld.hasNewBB = false;
+		tld.cfg.newBBSet = false;
 	}
 
 	//LEARNING
@@ -1204,8 +1204,8 @@ bool tldProcessFrame(TldStruct& tld, unsigned long i) {
 }
 
 void tldSetBB(TldStruct& tld, Vector4d& bb) {
-	tld.newBB = bb;
-	tld.hasNewBB = true;
+	tld.cfg.newBB = bb;
+	tld.cfg.newBBSet= true;
 }
 
 void tldSetImageSource(TldStruct& tld, ImageSource *src) {

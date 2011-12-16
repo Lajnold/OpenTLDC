@@ -50,8 +50,11 @@ struct Plot {
 // Configuration
 struct Config {
 	ImageSource *imgsource;
-	Eigen::Vector4d initBB;
+	Eigen::Vector4d newBB;
+	bool newBBSet;
 	Plot plot;
+
+	Config() : newBBSet(false) { }
 };
 
 
@@ -159,11 +162,6 @@ struct TldStruct {
 	double var;
 
 	CvImage handle;
-
-	Eigen::Vector4d newBB;
-	bool hasNewBB;
-
-	TldStruct() : hasNewBB(false) { }
 };
 
 #endif
