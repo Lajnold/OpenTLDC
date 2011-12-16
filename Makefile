@@ -5,6 +5,8 @@ CFLAGS :=
 LDFLAGS := -L/usr/lib
 LIBS := -lcv -lhighgui -lcxcore
 TAGS = ctags --fields=+S
+PREFIX = /usr/local
+CP = /bin/cp
 
 ifeq ($(MAKECMDGOALS), libtldc)
 	OPTS := $(OPTS) -fPIC
@@ -53,6 +55,11 @@ libtldc.so: $(BASE_OBJS)
 
 tags: $(SRCS) $(HDRS)
 	$(TAGS) $(SRCS) $(HDRS)
+
+install: libtldc.so
+	$(RM) $(PREFIX)/lib/libtldc.so && cp libtldc.so $(PREFIX)/lib/
+	@mkdir -p $(PREFIX)/include/tld
+	$(CP) include/tld/*.h $(PREFIX)/include/tld/
 
 clean:
 	-$(RM) $(ALL_OBJS) *.d **/*.d tldc
