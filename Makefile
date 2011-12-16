@@ -1,13 +1,16 @@
 CC := g++
 INCLUDES := -I/usr/include/eigen3/
-LIBS := -lcv -lhighgui -lcxcore
-OPTS := -O2 -g -pipe -Wall -c -fmessage-length=0 -MMD -MP
+OPTS := -O2 -g -pipe -Wall -c -MMD -MP
 CFLAGS :=
-USRLIB := -L/usr/lib
+LDFLAGS := -L/usr/lib
+LIBS := -lcv -lhighgui -lcxcore
 TAGS = ctags --fields=+S
 
-OBJS := \
-./run_TLD.o \
+ifeq ($(MAKECMDGOALS), libtldc)
+	OPTS := $(OPTS) -fPIC
+endif
+
+BASE_OBJS := \
 ./bbox/bb_cluster_confidence.o \
 ./bbox/bb_distance.o \
 ./bbox/bb_points.o \
@@ -22,30 +25,39 @@ OBJS := \
 ./mex/lk.o \
 ./mex/warp.o \
 ./tld/tld.o \
-./tld/tldExample.o \
 ./utils/mat2img.o \
 ./utils/median.o 
 
-SRCS = $(OBJS:.o=.cpp)
+TLDC_OBJS := \
+./run_TLD.o \
+./tld/tldExample.o
+
+ALL_OBJS := $(BASE_OBJS) $(TLDC_OBJS)
+
+SRCS = $(ALL_OBJS:.o=.cpp)
 HDRS = tld/*.h bbox/*.h img/*.h mex/*.h utils/*.h
 
 .PHONY: all clean
 
-tldc: $(OBJS)
+tldc: $(BASE_OBJS) $(TLDC_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'
-	$(CC) $(USRLIB) -o"tldc" $(OBJS) $(LIBS)
+	$(CC) $(LDFLAGS) -o"tldc" $(BASE_OBJS) $(TLDC_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
+
+libtldc: libtldc.so
+libtldc.so: $(BASE_OBJS)
+	@echo 'Building library: $@'
+	$(CC) $(LDFLAGS) -shared -Wl,-soname,libtldc.so -o libtldc.so $(BASE_OBJS) $(LIBS)
 
 tags: $(SRCS) $(HDRS)
 	$(TAGS) $(SRCS) $(HDRS)
 
 clean:
-	-$(RM) $(OBJS) *.d **/*.d tldc
+	-$(RM) $(ALL_OBJS) *.d **/*.d tldc
 	-$(RM) tags
 	-@echo ' '
-
 
 %.o: %.cpp
 	@echo 'Building file: $<'
@@ -54,4 +66,4 @@ clean:
 	@echo 'Finished building: $<'
 	@echo ' '
 
--include $(OBJS:.o=.d)
+-include $(ALL_OBJS:.o=.d)
