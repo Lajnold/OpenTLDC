@@ -3,6 +3,11 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 find_package(Eigen3 REQUIRED)
 
+include_directories(
+    ${EIGEN3_INCLUDE_DIR}
+    ${PROJECT_SOURCE_DIR}/include
+)
+
 set(BASE_SOURCE_FILES
     bbox/bb_cluster_confidence.cpp
     bbox/bb_distance.cpp
@@ -27,22 +32,33 @@ set(TLDC_SOURCE_FILES
     tld/tldExample.cpp
 )
 
+set(PUBLIC_HEADER_FILES
+    include/tld/tld.h
+    include/tld/structs.h
+    include/tld/tldconst.h
+    include/tld/ImageSource.h
+)
 
-add_executable(tldc ${BASE_SOURCE_FILES} ${TLDC_SOURCE_FILES})
+add_executable(tldc ${TLDC_SOURCE_FILES})
 
 add_library(libtldc SHARED ${BASE_SOURCE_FILES})
 set_target_properties(libtldc PROPERTIES OUTPUT_NAME "tldc")
-
-
-include_directories(
-    ${EIGEN3_INCLUDE_DIR}
-    ${PROJECT_SOURCE_DIR}/include
-)
 
 target_link_libraries(tldc
     cv
     cxcore
     highgui
+    libtldc
+)
+
+INSTALL(TARGETS tldc libtldc
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+)
+
+INSTALL(FILES
+    ${PUBLIC_HEADER_FILES}
+    DESTINATION include/tld
 )
 
 
