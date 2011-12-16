@@ -23,16 +23,17 @@
 
 #include <iostream>
 
-#include "tld.h"
+#include "tld/tld.h"
 
+namespace tld {
 
 /**
  *  Loop function of TLDC.
  *
- *  @param opt tld structure with initial values and thresholds
+ *  @param opt tldStruct structure with initial values and thresholds
  *  @param cfg stream settings and initial bounding box
  */
-void tldExample(TldStruct& tld, bool display) {
+void tldExample(TldStruct& tldStruct, bool display) {
 
 	srand(0);
 
@@ -40,11 +41,11 @@ void tldExample(TldStruct& tld, bool display) {
 
 	/* INITIALIZATION -------------------------------------- */
 
-	if(!tldInit(tld))
+	if(!tldInit(tldStruct))
 		return; // No images.
 
 	if(display)
-		tldDisplay(0, 0, tld, t);
+		tldDisplay(0, 0, tldStruct, t);
 
 	/* RUN-TIME -------------------------------------------- */
 
@@ -54,17 +55,17 @@ void tldExample(TldStruct& tld, bool display) {
 
 		t = (double)cv::getTickCount();
 
-		if(!tldProcessFrame(tld, i))
+		if(!tldProcessFrame(tldStruct))
 			break; // Out of images.
 
 		t = ((double)cv::getTickCount() - t)/cv::getTickFrequency();
 
 		if (display)
-			tldDisplay(1, i, tld, t);
+			tldDisplay(1, i, tldStruct, t);
 
-		std::cout << "BB - xmin: " << tld.currentBB(0) << " ymin: "
-				<< tld.currentBB(1) << " xmax: " << tld.currentBB(2) << " ymax: "
-				<< tld.currentBB(3) << std::endl;
+		std::cout << "BB - xmin: " << tldStruct.currentBB(0) << " ymin: "
+				<< tldStruct.currentBB(1) << " xmax: " << tldStruct.currentBB(2) << " ymax: "
+				<< tldStruct.currentBB(3) << std::endl;
 
 		i++;
 
@@ -73,3 +74,5 @@ void tldExample(TldStruct& tld, bool display) {
 	if(display)
 		cvDestroyWindow("Result");
 }
+
+} // namespace tld

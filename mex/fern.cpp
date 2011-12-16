@@ -397,7 +397,7 @@ Eigen::RowVectorXd fern3(Eigen::Matrix<double, 10, Eigen::Dynamic> const & nX2, 
 	return out;
 }
 
-void fern4(ImgType& img, double maxBBox, double minVar, Eigen::VectorXd& conf,
+void fern4(tld::ImgType& img, double maxBBox, double minVar, Eigen::VectorXd& conf,
 		Eigen::Matrix<double, 10, Eigen::Dynamic>& patt) {
 
 	for (int i = 0; i < nBBOX; i++)
@@ -427,7 +427,7 @@ void fern4(ImgType& img, double maxBBox, double minVar, Eigen::VectorXd& conf,
 
 }
 
-Eigen::Matrix<double, TLD_NTREES, Eigen::Dynamic> fern5(ImgType& img, std::vector<int>& idx, double var) {
+Eigen::Matrix<double, TLD_NTREES, Eigen::Dynamic> fern5(tld::ImgType& img, std::vector<int>& idx, double var) {
 
 	// bbox indexes
 	int numIdx = idx.size();

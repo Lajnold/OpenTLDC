@@ -31,8 +31,10 @@
 #include <Eigen/Dense>
 #include <Eigen/Core>
 
-#include "tldconst.h"
-#include "../img/ImageSource.h"
+#include "tld/tldconst.h"
+#include "tld/ImageSource.h"
+
+namespace tld {
 
 // Plot
 struct Plot {
@@ -162,6 +164,12 @@ struct TldStruct {
 	double var;
 
 	CvImage handle;
+
+	int frameNumber;
+
+	TldStruct() : frameNumber(0) { }
 };
+
+} // namespace tld
 
 #endif

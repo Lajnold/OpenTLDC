@@ -28,7 +28,7 @@
 #include <opencv/cv.h>
 #include <opencv/cvaux.h>
 
-#include "../tld/structs.h"
+#include "tld/structs.h"
 
 /* lucas kanade */
 void lkInit();
@@ -50,10 +50,10 @@ Eigen::RowVectorXd fern2(Eigen::Matrix<double, 10, Eigen::Dynamic> const & X,
 
 Eigen::RowVectorXd fern3(Eigen::Matrix<double, 10, Eigen::Dynamic> const & nX2, int n);
 
-void fern4(ImgType& img, double maxBBox, double minVar, Eigen::VectorXd& conf,
+void fern4(tld::ImgType& img, double maxBBox, double minVar, Eigen::VectorXd& conf,
 		Eigen::Matrix<double, 10, Eigen::Dynamic>& patt);
 
-Eigen::Matrix<double, TLD_NTREES, Eigen::Dynamic> fern5(ImgType& img, std::vector<
+Eigen::Matrix<double, TLD_NTREES, Eigen::Dynamic> fern5(tld::ImgType& img, std::vector<
 		int>& idx, double var);
 
 Eigen::MatrixXd

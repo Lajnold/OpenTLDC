@@ -1,5 +1,5 @@
 CC := g++
-INCLUDES := -I/usr/include/eigen3/
+INCLUDES := -I/usr/include/eigen3/ -I include/
 OPTS := -O2 -g -pipe -Wall -c -MMD -MP
 CFLAGS :=
 LDFLAGS := -L/usr/lib

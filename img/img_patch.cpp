@@ -29,7 +29,7 @@
 #include "../mex/mex.h"
 
 CvImage img_patch(CvImage img, Eigen::Vector4d const & bb, double randomize,
-		P_par& p_par) {
+		tld::P_par& p_par) {
 	if (randomize <= 0)
 		return CvImage();
 

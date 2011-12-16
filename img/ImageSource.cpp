@@ -1,4 +1,6 @@
-#include "ImageSource.h"
+#include "tld/ImageSource.h"
+
+namespace tld {
 
 CvImage ImageSource::getImage() {
 	return image;
@@ -49,3 +51,5 @@ CvImage CvCaptureImageSource::getNextImage() {
 	// can be freed after usage.
 	return CvImage(cvCloneImage(raw));
 }
+
+} // namespace tld

@@ -24,7 +24,7 @@
 #include "bbox.h"
 #include "../utils/utility.h"
 
-void bb_scan(TldStruct& tld, Eigen::Vector4d const & bb,
+void bb_scan(tld::TldStruct& tld, Eigen::Vector4d const & bb,
 		Eigen::Vector2i imsize, int minwin) {
 	double shift = 0.1;
 	//used for scaling the bb

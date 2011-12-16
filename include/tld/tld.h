@@ -24,7 +24,20 @@
 #ifndef TLD_H_
 #define TLD_H_
 
-#include "structs.h"
+#include <list>
+
+#include <opencv/cv.h>
+#include <opencv/cvaux.h>
+#include <opencv/highgui.h>
+
+#include <Eigen/Dense>
+#include <Eigen/Core>
+
+#include "tld/ImageSource.h"
+#include "tld/structs.h"
+#include "tld/tldconst.h"
+
+namespace tld {
 
 /* Shows results in additional window */
 void tldDisplay(int i, unsigned long index, TldStruct& tld, double fps);
@@ -39,13 +52,15 @@ bool tldInit(TldStruct& tld/*, CamImage& source, Person& persondetect*/);
 void tldInitDefaultTldStruct(TldStruct& tld);
 
 /* main method, is called on each loop */
-bool tldProcessFrame(TldStruct& tld, unsigned long i);
+bool tldProcessFrame(TldStruct& tld);
 
 /** Sets a new bounding box for the object. */
 void tldSetBB(TldStruct& tld, Eigen::Vector4d& bb);
 
 /** Sets the image source. */
 void tldSetImageSource(TldStruct& tld, ImageSource *src);
+
+} // namespace tld
 
 #endif /* TLD_H_ */
 

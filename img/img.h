@@ -28,10 +28,9 @@
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
 
-#include "../tld/structs.h"
+#include "tld/structs.h"
 
-CvImage img_patch(CvImage img, Eigen::Vector4d const & bb, double randomize,
-		P_par& p_par);
+CvImage img_patch(CvImage img, Eigen::Vector4d const & bb, double randomize, tld::P_par& p_par);
 
 CvImage img_patch(CvImage img, Eigen::Vector4d const & bb);
 

@@ -28,7 +28,7 @@
 #include <opencv/cv.h>
 #include <opencv/cvaux.h>
 
-#include "../tld/structs.h"
+#include "tld/structs.h"
 
 typedef struct {
 	int width;
@@ -160,7 +160,7 @@ Eigen::Matrix<double, 2, 150> bb_points(Eigen::VectorXd const & bb, int row,
 Eigen::Vector4d bb_predict(Eigen::VectorXd const & bb,
 		Eigen::MatrixXd const & xFI, Eigen::MatrixXd const & xFJ);
 
-void bb_scan(TldStruct& tld, Eigen::Vector4d const & bb,
+void bb_scan(tld::TldStruct& tld, Eigen::Vector4d const & bb,
 		Eigen::Vector2i imsize, int minwin);
 
 Eigen::Matrix<double, 4, Eigen::Dynamic> bb_cluster_confidence(Eigen::Matrix<

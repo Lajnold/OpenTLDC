@@ -7,6 +7,8 @@
 #include <opencv/cvaux.h>
 #include <opencv/highgui.h>
 
+namespace tld {
+
 class ImageSource {
 public:
 	bool nextImage();
@@ -50,5 +52,7 @@ protected:
 private:
 	CvCapture *source;
 };
+
+} // namespace tld
 
 #endif

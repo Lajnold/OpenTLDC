@@ -25,7 +25,9 @@
 
 #include "tld/tld.h"
 
-TldStruct tld;
+using namespace tld;
+
+TldStruct tldStruct;
 
 int main(int argc, char* argv[]) {
 
@@ -104,16 +106,16 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
-	tldInitDefaultTldStruct(tld);
-	tldSetImageSource(tld, &imgsource);
-	tldSetBB(tld, initBB);
+	tldInitDefaultTldStruct(tldStruct);
+	tldSetImageSource(tldStruct, &imgsource);
+	tldSetBB(tldStruct, initBB);
 
 	for(int i = 0; i < startFrame; i++) {
 		// Ignore all frames up to startFrame.
-		if(!tld.cfg.imgsource->nextImage())
+		if(!tldStruct.cfg.imgsource->nextImage())
 			exit(0); // Ran out of images.
 	}
 
-	tldExample(tld, !nodisplay);
+	tldExample(tldStruct, !nodisplay);
 	cvReleaseCapture(&captureSource);
 }

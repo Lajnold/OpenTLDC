@@ -32,8 +32,8 @@
 #include <opencv/cxcore.h>
 #include <opencv/highgui.h>
 
-#include "structs.h"
-#include "tldconst.h"
+#include "tld/structs.h"
+#include "tld/tldconst.h"
 #include "../bbox/bbox.h"
 #include "../img/img.h"
 #include "../mex/mex.h"
@@ -60,6 +60,8 @@ struct Indices {
 		return a.conf > b.conf;
 	}
 };
+
+namespace tld {
 
 Matrix<double, 20, 1> tldDetection(TldStruct& tld, int i, Matrix<double, 4, 20>& dBB, int& n);
 
@@ -1085,12 +1087,14 @@ Matrix<double, TLD_PATCHSIZE * TLD_PATCHSIZE, 1> tldPatch2Pattern(CvImage patch,
 	return pattern;
 }
 
-bool tldProcessFrame(TldStruct& tld, unsigned long i) {
+bool tldProcessFrame(TldStruct& tld) {
 
 	tld.prevImg = tld.currentImg;
 
 	if(!tld.cfg.imgsource->nextImage())
 		return false;
+
+	tld.frameNumber++;
 
 	//Input image
 	ImgType im0;
@@ -1114,13 +1118,13 @@ bool tldProcessFrame(TldStruct& tld, unsigned long i) {
 
 	//TRACKER
 	//rame-to-frame tracking (MedianFlow)
-	VectorXd tldTrack = tldTracking(tld, tld.prevBB, i - 1, i);
+	VectorXd tldTrack = tldTracking(tld, tld.prevBB, tld.frameNumber - 1, tld.frameNumber);
 
 	//DETECTOR
 	//detect appearances by cascaded detector (variance filter -> ensemble classifier -> nearest neighbor)
 	Matrix<double, 4, 20> dBB;
 	int nD = 0;
-	Matrix<double, 20, 1> detConf = tldDetection(tld, i, dBB, nD);
+	Matrix<double, 20, 1> detConf = tldDetection(tld, tld.frameNumber, dBB, nD);
 
 	//INTEGRATOR
 	//Tracker defined?
@@ -1198,7 +1202,7 @@ bool tldProcessFrame(TldStruct& tld, unsigned long i) {
 
 	//LEARNING
 	if (tld.control.update_detector && tld.currentValid == 1)
-		tldLearning(tld, i);
+		tldLearning(tld, tld.frameNumber);
 
 	return true;
 }
@@ -1432,3 +1436,5 @@ void tldTrainNN(
 
 	}
 }
+
+} // namespace tld
