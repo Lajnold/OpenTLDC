@@ -22,6 +22,7 @@
  */
 
 #include <cassert>
+#include <iostream>
 
 #include "tld/tld.h"
 
@@ -82,12 +83,15 @@ int main(int argc, char* argv[]) {
 	}
 
 	if (videopath == "" && camindex == -1) {
+		std::cout << "No image source specified.\n";
 		exit(0);
 	}
 
 	if (initBB(0) == -1 || initBB(1) == -1 || initBB(2) == -1 || initBB(3)
-			== -1)
+			== -1) {
+		std::cout << "No bounding box specified.\n";
 		exit(0);
+	}
 
 	if(camindex >= 0)
 		captureSource = cvCaptureFromCAM(camindex);
