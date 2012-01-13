@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 2.6)
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 find_package(Eigen3 REQUIRED)
+find_package(OpenCV REQUIRED)
 
 include_directories(
     ${EIGEN3_INCLUDE_DIR}
@@ -45,10 +46,12 @@ add_library(libtldc SHARED ${BASE_SOURCE_FILES})
 set_target_properties(libtldc PROPERTIES OUTPUT_NAME "tldc")
 
 target_link_libraries(tldc
-    cv
-    cxcore
-    highgui
+    ${OpenCV_LIBS}
     libtldc
+)
+
+target_link_libraries(libtldc
+    ${OpenCV_LIBS}
 )
 
 INSTALL(TARGETS tldc libtldc
