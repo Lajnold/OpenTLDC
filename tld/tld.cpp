@@ -371,7 +371,7 @@ void tldDisplay(int i, unsigned long index, TldStruct& tld, double fps) {
 
 		// Draw Track
 		unsigned int linewidth = 2;
-		if (tld.currentValid == 1)
+		if (tld.currentValid)
 			linewidth = 4;
 		cv::Scalar color = cv::Scalar(0, 255, 255);
 
@@ -446,7 +446,7 @@ bool tldInit(TldStruct& tld) {
 			std::numeric_limits<double>::quiet_NaN());
 	tld.currentBB = bb;
 	tld.conf = 1;
-	tld.currentValid = 1;
+	tld.currentValid = true;
 	//tld.size = 1;
 
 	// TRAIN DETECTOR ==========================================================
@@ -919,7 +919,7 @@ void tldLearning(TldStruct& tld, unsigned long I) {
 
 	if (nn(0, 0) < 0.5) {
 		std::cout << "Fast change" << std::endl;
-		tld.currentValid = 0;
+		tld.currentValid = false;
 		return;
 	}
 
@@ -929,13 +929,13 @@ void tldLearning(TldStruct& tld, unsigned long I) {
 
 	if (variance(pPattVec, patRows) < tld.var) {
 		std::cout << "Low variance" << std::endl;
-		tld.currentValid = 0;
+		tld.currentValid = false;
 		return;
 	}
 
 	if (nn(2, 2) == 1) {
 		std::cout << "In negative data" << std::endl;
-		tld.currentValid = 0;
+		tld.currentValid = false;
 		return;
 	}
 
@@ -1114,7 +1114,7 @@ bool tldProcessFrame(TldStruct& tld) {
 
 	/* valid */
 	tld.prevValid = tld.currentValid;
-	tld.currentValid = 0;
+	tld.currentValid = false;
 
 	//TRACKER
 	//rame-to-frame tracking (MedianFlow)
@@ -1163,7 +1163,7 @@ bool tldProcessFrame(TldStruct& tld) {
 				tld.currentBB = cBB.col(id[0]);
 				tld.conf = cConf(0, id[0]);
 				//tld.size = cSize(0, id[0]);
-				tld.currentValid = 0;
+				tld.currentValid = false;
 			} else {
 				//adjust the tracker's trajectory
 				//get indexes of close detections
@@ -1190,18 +1190,18 @@ bool tldProcessFrame(TldStruct& tld) {
 				tld.currentBB = cluster.col(0);
 				tld.conf = cluster(0, 1);
 				//tld.size = cluster(0, 2);
-				tld.currentValid = 0;
+				tld.currentValid = false;
 			}
 	} else if (tld.cfg.newBBSet) {
 		tld.currentBB = tld.cfg.newBB;
 		tld.conf = 1;
 		//tld.size = ???
-		tld.currentValid = 1;
+		tld.currentValid = true;
 		tld.cfg.newBBSet = false;
 	}
 
 	//LEARNING
-	if (tld.control.update_detector && tld.currentValid == 1)
+	if (tld.control.update_detector && tld.currentValid)
 		tldLearning(tld, tld.frameNumber);
 
 	return true;

@@ -147,8 +147,8 @@ struct TldStruct {
 	Eigen::Vector4d prevBB;
 	Eigen::Vector4d currentBB;
 	double conf;
-	double prevValid;
-	double currentValid;
+	bool prevValid;
+	bool currentValid;
 	//double size;
 
 	CvImage target;
