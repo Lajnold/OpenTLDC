@@ -178,7 +178,7 @@ Matrix<double, 20, 1> tldDetection(TldStruct& tld, int i, Matrix<
 
 	// evaluates Ensemble Classifier: saves sum of posteriors to 'tld.tmp.conf', saves
 	// measured codes to 'tld.tmp.patt'
-	fern4(tld.currentImg, tld.control.maxbbox, tld.var, tld.tmp.conf,
+	fern4(tld.fernData, tld.currentImg, tld.control.maxbbox, tld.var, tld.tmp.conf,
 			tld.tmp.patt);
 
 	// get indexes of bounding boxes that passed through the Ensemble Classifier
@@ -423,11 +423,8 @@ bool tldInit(TldStruct& tld) {
 	// Features
 	tldGenerateFeatures(tld, tld.model.num_trees, tld.model.num_features);
 
-	// Initialize Detector
-	fern0();
-
 	// allocate structures
-	fern1(tld.currentImg.input, tld.grid, tld.features, tld.scales);
+	fern1(tld.fernData, tld.currentImg.input, tld.grid, tld.features, tld.scales);
 
 	// Temporal structures
 	Tmp temporal;
@@ -494,7 +491,7 @@ bool tldInit(TldStruct& tld) {
 	unsigned char bootstrap = 2;
 	VectorXd dummy(1);
 	dummy(0) = -1;
-	fern2(permX, permY, tld.model.thr_fern, bootstrap, dummy);
+	fern2(tld.fernData, permX, permY, tld.model.thr_fern, bootstrap, dummy);
 
 	// Nearest Neighbour
 	tld.npex = 0;
@@ -510,7 +507,7 @@ bool tldInit(TldStruct& tld) {
 	RowVectorXd conf_fern(ferninsize);
 	Matrix<double, 10, Dynamic> fernin(10, ferninsize);
 	fernin.leftCols(ferninsize) = spnX.rightCols(ferninsize);
-	conf_fern = fern3(fernin, ferninsize);
+	conf_fern = fern3(tld.fernData, fernin, ferninsize);
 	tld.model.thr_fern = std::max(conf_fern.maxCoeff() / tld.model.num_trees,
 			tld.model.thr_fern);
 
@@ -699,7 +696,7 @@ void tldGenerateNegativeData(TldStruct& tld,
 	}
 
 	MatrixXd fernpat(TLD_NTREES, idxN.size() + 1);
-	fernpat = fern5(img, idxN, tld.var / 2);
+	fernpat = fern5(tld.fernData, img, idxN, tld.var / 2);
 
 	// bboxes far and with big variance
 	unsigned int len = fernpat.cols();
@@ -840,7 +837,7 @@ Vector4d tldGeneratePositiveData(TldStruct& tld,
 
 		// Measures on blured image
 		MatrixXd fernout(TLD_NTREES, idxPi.size() * 2);
-		fernout = fern5(im1, idxPi, 0);
+		fernout = fern5(tld.fernData, im1, idxPi, 0);
 		unsigned int frncols = fernout.cols() / 2;
 
 		 // save indices
@@ -988,7 +985,7 @@ void tldLearning(TldStruct& tld, unsigned long I) {
 	VectorXd dummy(1);
 	dummy(0) = -1;
 
-	fern2(X, Y, tld.model.thr_fern, 2, dummy);
+	fern2(tld.fernData, X, Y, tld.model.thr_fern, 2, dummy);
 
 	// update nearest neighbour
 	tldTrainNN(pEx, nEx, tld);

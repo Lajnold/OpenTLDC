@@ -30,28 +30,10 @@
 #include "mex.h"
 #include "../utils/utility.h"
 
-typedef struct {
-	int row;
-	int col;
-} PT;
+using namespace tld;
 
-static double thrN;
-static int nBBOX;
-static int mBBOX;
-static int nTREES;
-static int nFEAT;
-static int nSCALE;
-static int iHEIGHT;
-static int iWIDTH;
-static PT *BBOX = NULL;
-static PT *OFF = NULL;
-static double *IIMG = 0;
-static double *IIMG2 = 0;
-static std::vector<std::vector<double> > WEIGHT;
-static std::vector<std::vector<int> > nP;
-static std::vector<std::vector<int> > nN;
-static int BBOX_STEP = 7;
-static int nBIT = 1; // number of bits per feature
+static const int BBOX_STEP = 7;
+static const int nBIT = 1; // number of bits per feature
 
 #define sub2idx(row,col,height) ((int) (floor((row)+0.5) + floor((col)+0.5)*(height)))
 
@@ -116,51 +98,49 @@ void iimg2(IplImage *in, double *ii2, int imH, int imW) {
 
 }
 
-double bbox_var_offset(double *ii, double *ii2, PT *off, int iHEIGHT) {
+double bbox_var_offset(double *ii, double *ii2, Point *off, int imgHeight) {
 	// off[0-3] corners of bbox, off[4] area
 
-	double mX = (ii[off[3].row + off[3].col * iHEIGHT] - ii[off[2].row
-			+ off[2].col * iHEIGHT] - ii[off[1].row + off[1].col * iHEIGHT]
-			+ ii[off[0].row + off[0].col * iHEIGHT]) / (double) off[4].row;
+	double mX = (ii[off[3].row + off[3].col * imgHeight] - ii[off[2].row
+			+ off[2].col * imgHeight] - ii[off[1].row + off[1].col * imgHeight]
+			+ ii[off[0].row + off[0].col * imgHeight]) / (double) off[4].row;
 
-	double mX2 = (ii2[off[3].row + off[3].col * iHEIGHT] - ii2[off[2].row
-			+ off[2].col * iHEIGHT] - ii2[off[1].row + off[1].col * iHEIGHT]
-			+ ii2[off[0].row + off[0].col * iHEIGHT]) / (double) off[4].row;
+	double mX2 = (ii2[off[3].row + off[3].col * imgHeight] - ii2[off[2].row
+			+ off[2].col * imgHeight] - ii2[off[1].row + off[1].col * imgHeight]
+			+ ii2[off[0].row + off[0].col * imgHeight]) / (double) off[4].row;
 
 	return mX2 - mX * mX;
 }
 
-void update(Eigen::Matrix<double, 10, 1> x, int C, int N) {
-	for (int i = 0; i < nTREES; i++) {
+void update(FernData &fernData, Eigen::Matrix<double, 10, 1> x, int C, int N) {
+	for (int i = 0; i < fernData.nTrees; i++) {
 
 		int idx = (int) x(i);
 
-		(C == 1) ? nP[i][idx] += N : nN[i][idx] += N;
+		(C == 1) ? fernData.nP[i][idx] += N : fernData.nN[i][idx] += N;
 
-		if (nP[i][idx] == 0) {
-			WEIGHT[i][idx] = 0;
+		if (fernData.nP[i][idx] == 0) {
+			fernData.weights[i][idx] = 0;
 		} else {
-			WEIGHT[i][idx] = ((double) (nP[i][idx]))
-					/ (nP[i][idx] + nN[i][idx]);
+			fernData.weights[i][idx] = ((double) (fernData.nP[i][idx])) / (fernData.nP[i][idx] + fernData.nN[i][idx]);
 		}
 	}
 }
 
-double measure_forest(Eigen::Matrix<double, 10, 1> idx) {
+double measure_forest(FernData &fernData, Eigen::Matrix<double, 10, 1> idx) {
 	double votes = 0;
-	for (int i = 0; i < nTREES; i++) {
-		votes += WEIGHT[i][idx(i)];
+	for (int i = 0; i < fernData.nTrees; i++) {
+		votes += fernData.weights[i][idx(i)];
 	}
 	return votes;
 }
 
-PT* create_offsets_bbox(
-		Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> bb) {
+Point* create_offsets_bbox(FernData &fernData, Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> bb) {
 
-	PT *offsets = (PT*) malloc(BBOX_STEP * nBBOX * sizeof(PT));
-	PT *off = offsets;
+	Point *offsets = new Point[BBOX_STEP * fernData.nBbox];
+	Point *off = offsets;
 
-	for (int i = 0; i < nBBOX; i++) {
+	for (int i = 0; i < fernData.nBbox; i++) {
 		(*off).row = (int) floor((bb(1, i) - 1) + 0.5);
 		(*off).col = (int) floor((bb(0, i) - 1) + 0.5); // 0
 		off++;
@@ -175,7 +155,7 @@ PT* create_offsets_bbox(
 		off++;
 		(*off).row = (int) ((bb(2, i) - bb(0, i)) * (bb(3, i) - bb(1, i))); // 4
 		off++;
-		(*off).row = (int) (bb(4, i) - 1) * 2 * nFEAT * nTREES; // 5
+		(*off).row = (int) (bb(4, i) - 1) * 2 * fernData.nFeat * fernData.nTrees; // 5
 		off++;
 		(*off).row = bb(5, i); // 6
 		off++;
@@ -183,17 +163,17 @@ PT* create_offsets_bbox(
 	return offsets;
 }
 
-PT* create_offsets(Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> scale,
+Point* create_offsets(FernData &fernData, Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> scale,
 		Eigen::Matrix<double, 4 * TLD_NFEATURES, TLD_NTREES> x) {
 
 
-	PT *offsets = (PT*) malloc(nSCALE * nTREES * nFEAT * 2 * sizeof(PT));
-	PT *off = offsets;
+	Point *offsets = new Point[fernData.nScale * fernData.nTrees * fernData.nFeat * 2];
+	Point *off = offsets;
 
-	for (int k = 0; k < nSCALE; k++) {
+	for (int k = 0; k < fernData.nScale; k++) {
 		//double *scale = scale0 + 2 * k;
-		for (int i = 0; i < nTREES; i++) {
-			for (int j = 0; j < nFEAT; j++) {
+		for (int i = 0; i < fernData.nTrees; i++) {
+			for (int j = 0; j < fernData.nFeat; j++) {
 				(*off).row = (int) floor(((scale(0, k) - 1) * x(4 * j + 1, i))
 						+ 0.5);
 				(*off).col = (int) floor(((scale(1, k) - 1) * x(4 * j, i))
@@ -211,22 +191,22 @@ PT* create_offsets(Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> scale,
 	return offsets;
 }
 
-int measure_tree_offset(IplImage* img, int idx_bbox, int idx_tree) {
+int measure_tree_offset(FernData &fernData, IplImage* img, int idx_bbox, int idx_tree) {
 
 	int index = 0;
 
-	PT *bbox = BBOX + idx_bbox * BBOX_STEP;
-	PT *off = OFF + bbox[5].row + idx_tree * 2 * nFEAT;
+	Point *bbox = fernData.bboxes + idx_bbox * BBOX_STEP;
+	Point *off = fernData.offsets + bbox[5].row + idx_tree * 2 * fernData.nFeat;
 
-	for (int i = 0; i < nFEAT; i++) {
+	for (int i = 0; i < fernData.nFeat; i++) {
 		index <<= 1;
 		int fp0 = 0;
-		if ((off[0].row + bbox[0].row) < iHEIGHT)
+		if ((off[0].row + bbox[0].row) < fernData.imgHeight)
 			fp0 = ((uchar*) (img->imageData + img->widthStep * (off[0].row
 					+ bbox[0].row)))[off[0].col + bbox[0].col];
 
 		int fp1 = 0;
-		if ((off[1].row + bbox[0].row) < iHEIGHT)
+		if ((off[1].row + bbox[0].row) < fernData.imgHeight)
 			fp1 = ((uchar*) (img->imageData + img->widthStep * (off[1].row
 					+ bbox[0].row)))[off[1].col + bbox[0].col];
 
@@ -238,101 +218,73 @@ int measure_tree_offset(IplImage* img, int idx_bbox, int idx_tree) {
 	return index;
 }
 
-double measure_bbox_offset(IplImage *blur, int idx_bbox, double minVar,
+double measure_bbox_offset(FernData &fernData, IplImage *blur, int idx_bbox, double minVar,
 		Eigen::Matrix<double, 10, Eigen::Dynamic>& patt) {
 
 	double conf = 0.0;
 
-	double bboxvar = bbox_var_offset(IIMG, IIMG2, BBOX + idx_bbox * BBOX_STEP,
-			iHEIGHT);
+	double bboxvar = bbox_var_offset(fernData.integralImg, fernData.integralImg2, fernData.bboxes + idx_bbox * BBOX_STEP,
+			fernData.imgHeight);
 
 	if (bboxvar < minVar) {
 		return conf;
 	}
 
-	for (int i = 0; i < nTREES; i++) {
-		int idx = measure_tree_offset(blur, idx_bbox, i);
+	for (int i = 0; i < fernData.nTrees; i++) {
+		int idx = measure_tree_offset(fernData, blur, idx_bbox, i);
 		patt(i, idx_bbox) = idx;
-		conf += WEIGHT[i][idx];
+		conf += fernData.weights[i][idx];
 	}
 	return conf;
 }
 
 /*
- *  Cleanup
- */
-void fern0() {
-
-	thrN = 0;
-	nBBOX = 0;
-	mBBOX = 0;
-	nTREES = 0;
-	nFEAT = 0;
-	nSCALE = 0;
-	iHEIGHT = 0;
-	iWIDTH = 0;
-
-	free(BBOX);
-	BBOX = 0;
-	free(OFF);
-	OFF = 0;
-	free(IIMG);
-	IIMG = 0;
-	free(IIMG2);
-	IIMG2 = 0;
-	WEIGHT.clear();
-	nP.clear();
-	nN.clear();
-	return;
-}
-
-/*
  *  Initialization (source, grid, features, scales)
  */
-void fern1(IplImage* source,
+void fern1(FernData &fernData, IplImage* source,
 		Eigen::Matrix<double, 6, Eigen::Dynamic> const & grid, Eigen::Matrix<
 				double, 4 * TLD_NFEATURES, TLD_NTREES> const & features, Eigen::Matrix<
 				double, 2, 21> const & scales) {
 
-	iHEIGHT = source->height;
-	iWIDTH = source->width;
-	nTREES = features.cols();
-	nFEAT = features.rows() / 4; // feature has 4 values: x1,y1,x2,y2
-	thrN = 0.5 * nTREES;
-	nSCALE = scales.cols();
+	fernData.imgHeight = source->height;
+	fernData.imgWidth = source->width;
+	fernData.nTrees = features.cols();
+	fernData.nFeat = features.rows() / 4; // feature has 4 values: x1,y1,x2,y2
+	fernData.thrN = 0.5 * fernData.nTrees;
+	fernData.nScale = scales.cols();
 
-	IIMG = (double*) malloc(iHEIGHT * iWIDTH * sizeof(double));
-	IIMG2 = (double*) malloc(iHEIGHT * iWIDTH * sizeof(double));
+	fernData.integralImg = new double[fernData.imgHeight * fernData.imgWidth];
+	fernData.integralImg2 = new double[fernData.imgHeight * fernData.imgWidth];
 
-	// BBOX
-	mBBOX = grid.rows();
-	nBBOX = grid.cols();
-	BBOX = create_offsets_bbox(grid);
-	OFF = create_offsets(scales, features);
+	// bboxes
+	fernData.mBbox = grid.rows();
+	fernData.nBbox = grid.cols();
+	fernData.bboxes = create_offsets_bbox(fernData, grid);
+	fernData.offsets = create_offsets(fernData, scales, features);
 
-	for (int i = 0; i < nTREES; i++) {
-		WEIGHT.push_back(std::vector<double> (pow(2.0, nBIT * nFEAT), 0));
-		nP.push_back(std::vector<int> (pow(2.0, nBIT * nFEAT), 0));
-		nN.push_back(std::vector<int> (pow(2.0, nBIT * nFEAT), 0));
+	for (int i = 0; i < fernData.nTrees; i++) {
+		fernData.weights.push_back(std::vector<double> (pow(2.0, nBIT * fernData.nFeat), 0));
+		fernData.nP.push_back(std::vector<int> (pow(2.0, nBIT * fernData.nFeat), 0));
+		fernData.nN.push_back(std::vector<int> (pow(2.0, nBIT * fernData.nFeat), 0));
 	}
 
-	for (int i = 0; i < nTREES; i++) {
-		for (unsigned int j = 0; j < WEIGHT[i].size(); j++) {
-			WEIGHT[i].at(j) = 0;
-			nP[i].at(j) = 0;
-			nN[i].at(j) = 0;
+	for (int i = 0; i < fernData.nTrees; i++) {
+		for (unsigned int j = 0; j < fernData.weights[i].size(); j++) {
+			fernData.weights[i].at(j) = 0;
+			fernData.nP[i].at(j) = 0;
+			fernData.nN[i].at(j) = 0;
 		}
 	}
 
 	return;
 }
 
-Eigen::RowVectorXd fern2(Eigen::Matrix<double, 10, Eigen::Dynamic> const & X,
+Eigen::RowVectorXd fern2(FernData &fernData, Eigen::Matrix<double, 10, Eigen::Dynamic> const & X,
 		Eigen::VectorXd const & Y, double margin,
 		unsigned char bootstrap, Eigen::VectorXd const & idx) {
 
 	int numX = X.cols();
-	double thrP = margin * nTREES;
+	double thrP = margin * fernData.nTrees;
 
 	int step = numX / 10;
 
@@ -343,13 +295,13 @@ Eigen::RowVectorXd fern2(Eigen::Matrix<double, 10, Eigen::Dynamic> const & X,
 				for (int k = 0; k < 10; k++) {
 
 					int I = k * step + i;
-					//double *x = X+nTREES*I;
+					//double *x = X+nTrees*I;
 					if (Y(I) == 1) {
-						if (measure_forest(X.col(I)) <= thrP)
-							update(X.col(I), 1, 1);
+						if (measure_forest(fernData, X.col(I)) <= thrP)
+							update(fernData, X.col(I), 1, 1);
 					} else {
-						if (measure_forest(X.col(I)) >= thrN)
-							update(X.col(I), 0, 1);
+						if (measure_forest(fernData, X.col(I)) >= fernData.thrN)
+							update(fernData, X.col(I), 0, 1);
 					}
 				}
 			}
@@ -364,13 +316,13 @@ Eigen::RowVectorXd fern2(Eigen::Matrix<double, 10, Eigen::Dynamic> const & X,
 
 			for (int i = 0; i < nIdx; i++) {
 				int I = idx(i);
-				//double *x = X+nTREES*I;
+				//double *x = X+nTrees*I;
 				if (Y(I) == 1) {
-					if (measure_forest(X.col(I)) <= thrP)
-						update(X.col(I), 1, 1);
+					if (measure_forest(fernData, X.col(I)) <= thrP)
+						update(fernData, X.col(I), 1, 1);
 				} else {
-					if (measure_forest(X.col(I)) >= thrN)
-						update(X.col(I), 0, 1);
+					if (measure_forest(fernData, X.col(I)) >= fernData.thrN)
+						update(fernData, X.col(I), 0, 1);
 				}
 			}
 
@@ -380,39 +332,39 @@ Eigen::RowVectorXd fern2(Eigen::Matrix<double, 10, Eigen::Dynamic> const & X,
 	Eigen::MatrixXd out(1, numX);
 
 	for (int i = 0; i < numX; i++) {
-		out(0, i) = measure_forest(X.col(i));
+		out(0, i) = measure_forest(fernData, X.col(i));
 	}
 
 	return out;
 }
 
-Eigen::RowVectorXd fern3(Eigen::Matrix<double, 10, Eigen::Dynamic> const & nX2, int n) {
+Eigen::RowVectorXd fern3(FernData &fernData, Eigen::Matrix<double, 10, Eigen::Dynamic> const & nX2, int n) {
 
 	int numX = n;
 	Eigen::RowVectorXd out(numX);
 
 	for (int i = 0; i < numX; i++)
-		out(i) = measure_forest(nX2.col(i));
+		out(i) = measure_forest(fernData, nX2.col(i));
 
 	return out;
 }
 
-void fern4(tld::ImgType& img, double maxBBox, double minVar, Eigen::VectorXd& conf,
+void fern4(FernData &fernData, tld::ImgType& img, double maxBBox, double minVar, Eigen::VectorXd& conf,
 		Eigen::Matrix<double, 10, Eigen::Dynamic>& patt) {
 
-	for (int i = 0; i < nBBOX; i++)
+	for (int i = 0; i < fernData.nBbox; i++)
 		conf(i) = -1;
 
 	double probability = maxBBox;
-	double nTest = nBBOX * probability;
-	if (nTest > nBBOX)
-		nTest = nBBOX;
+	double nTest = fernData.nBbox * probability;
+	if (nTest > fernData.nBbox)
+		nTest = fernData.nBbox;
 
-	double pStep = (double) nBBOX / nTest;
+	double pStep = (double) fernData.nBbox / nTest;
 	double pState = uniform() * pStep;
 
-	iimg(img.input, IIMG, iHEIGHT, iWIDTH);
-	iimg2(img.input, IIMG2, iHEIGHT, iWIDTH);
+	iimg(img.input, fernData.integralImg, fernData.imgHeight, fernData.imgWidth);
+	iimg2(img.input, fernData.integralImg2, fernData.imgHeight, fernData.imgWidth);
 
 	unsigned int I = 0;
 
@@ -420,33 +372,32 @@ void fern4(tld::ImgType& img, double maxBBox, double minVar, Eigen::VectorXd& co
 
 		I = (unsigned int) floor(pState);
 		pState += pStep;
-		if (pState >= nBBOX)
+		if (pState >= fernData.nBbox)
 			break;
-		conf(I) = measure_bbox_offset(img.blur, I, minVar, patt);
+		conf(I) = measure_bbox_offset(fernData, img.blur, I, minVar, patt);
 	}
 
 }
 
-Eigen::Matrix<double, TLD_NTREES, Eigen::Dynamic> fern5(tld::ImgType& img, std::vector<int>& idx, double var) {
+Eigen::Matrix<double, TLD_NTREES, Eigen::Dynamic> fern5(FernData &fernData, tld::ImgType& img, std::vector<int>& idx, double var) {
 
 	// bbox indexes
 	int numIdx = idx.size();
 
 	// minimal variance
 	if (var > 0) {
-		iimg(img.input, IIMG, iHEIGHT, iWIDTH);
-		iimg2(img.input, IIMG2, iHEIGHT, iWIDTH);
+		iimg(img.input, fernData.integralImg, fernData.imgHeight, fernData.imgWidth);
+		iimg2(img.input, fernData.integralImg2, fernData.imgHeight, fernData.imgWidth);
 	}
 
 	// output patterns
-	Eigen::MatrixXd patt(nTREES, numIdx);
-	Eigen::MatrixXd status(nTREES, numIdx);
+	Eigen::MatrixXd patt(fernData.nTrees, numIdx);
+	Eigen::MatrixXd status(fernData.nTrees, numIdx);
 
 	for (int j = 0; j < numIdx; j++) {
 
 		if (var > 0) {
-			double bboxvar = bbox_var_offset(IIMG, IIMG2, BBOX + j * BBOX_STEP,
-					iHEIGHT);
+			double bboxvar = bbox_var_offset(fernData.integralImg, fernData.integralImg2, fernData.bboxes + j * BBOX_STEP, fernData.imgHeight);
 			if (bboxvar < var) {
 				status(0, j) = 0;
 				continue;
@@ -454,11 +405,11 @@ Eigen::Matrix<double, TLD_NTREES, Eigen::Dynamic> fern5(tld::ImgType& img, std::
 		}
 
 		status(0, j) = 1;
-		for (int i = 0; i < nTREES; i++) {
-			patt(i, j) = (double) measure_tree_offset(img.blur, idx[j], i);
+		for (int i = 0; i < fernData.nTrees; i++) {
+			patt(i, j) = (double) measure_tree_offset(fernData, img.blur, idx[j], i);
 		}
 	}
-	Eigen::MatrixXd outpattern(nTREES, numIdx * 2);
+	Eigen::MatrixXd outpattern(fernData.nTrees, numIdx * 2);
 	outpattern << patt, status;
 
 

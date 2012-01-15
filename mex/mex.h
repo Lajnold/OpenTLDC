@@ -37,22 +37,21 @@ Eigen::Matrix<double, 4, 150> lk2(tld::TldStruct &tld, IplImage* imgI, IplImage*
 		unsigned int level);
 
 /* fern */
-void fern0();
-void fern1(IplImage* source,
+void fern1(tld::FernData &fernData, IplImage* source,
 		Eigen::Matrix<double, 6, Eigen::Dynamic> const & grid, Eigen::Matrix<
 				double, 4 * TLD_NFEATURES, TLD_NTREES> const & features, Eigen::Matrix<
 				double, 2, 21> const & scales);
 
-Eigen::RowVectorXd fern2(Eigen::Matrix<double, 10, Eigen::Dynamic> const & X,
+Eigen::RowVectorXd fern2(tld::FernData &fernData, Eigen::Matrix<double, 10, Eigen::Dynamic> const & X,
 		Eigen::VectorXd const & Y, double margin, unsigned char bootstrap,
 		Eigen::VectorXd const & idx);
 
-Eigen::RowVectorXd fern3(Eigen::Matrix<double, 10, Eigen::Dynamic> const & nX2, int n);
+Eigen::RowVectorXd fern3(tld::FernData &fernData, Eigen::Matrix<double, 10, Eigen::Dynamic> const & nX2, int n);
 
-void fern4(tld::ImgType& img, double maxBBox, double minVar, Eigen::VectorXd& conf,
+void fern4(tld::FernData &fernData, tld::ImgType& img, double maxBBox, double minVar, Eigen::VectorXd& conf,
 		Eigen::Matrix<double, 10, Eigen::Dynamic>& patt);
 
-Eigen::Matrix<double, TLD_NTREES, Eigen::Dynamic> fern5(tld::ImgType& img, std::vector<
+Eigen::Matrix<double, TLD_NTREES, Eigen::Dynamic> fern5(tld::FernData &fernData, tld::ImgType& img, std::vector<
 		int>& idx, double var);
 
 Eigen::MatrixXd

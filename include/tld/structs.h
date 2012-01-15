@@ -135,6 +135,44 @@ struct LKData {
 	}
 };
 
+struct Point {
+	int row;
+	int col;
+};
+
+struct FernData {
+	double thrN;
+
+	int nBbox;
+	int mBbox;
+	int nTrees;
+	int nFeat;
+	int nScale;
+	int imgHeight;
+	int imgWidth;
+
+	Point *bboxes;
+	Point *offsets;
+	double *integralImg;
+	double *integralImg2;
+	std::vector<std::vector<double> > weights;
+	std::vector<std::vector<int> > nP;
+	std::vector<std::vector<int> > nN;
+
+	FernData() : bboxes(0), offsets(0), integralImg(0), integralImg2(0) { }
+
+	~FernData() {
+		if(bboxes)
+			delete[] bboxes;
+		if(offsets)
+			delete[] offsets;
+		if(integralImg)
+			delete[] integralImg;
+		if(integralImg2)
+			delete[] integralImg2;
+	}
+};
+
 // Structure of TLD
 struct TldStruct {
 	Model model;
@@ -147,6 +185,7 @@ struct TldStruct {
 	Control control;
 
 	LKData lkData;
+	FernData fernData;
 
 	Eigen::Matrix<double, 4 * TLD_NFEATURES, TLD_NTREES> features;
 	int nGrid;
