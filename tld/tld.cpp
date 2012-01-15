@@ -405,9 +405,6 @@ void tldDisplay(int i, unsigned long index, TldStruct& tld, double fps) {
  */
 bool tldInit(TldStruct& tld) {
 
-	// initialize lucas kanade
-	lkInit();
-
 	// Get initial image
 	if(!tld.cfg.imgsource->nextImage())
 		return false;
@@ -1274,7 +1271,7 @@ VectorXd tldTracking(TldStruct& tld, VectorXd const & bb, int i, int j) {
 	xFI = bb_points(bb, 10, 10, 5, xFISize);
 	MatrixXd xFJ(4, 150);
 	//get all reliable points
-	xFJ = lk2(tld.prevImg.input, tld.currentImg.input, xFI, xFI, xFISize, xFISize, 0);
+	xFJ = lk2(tld, tld.prevImg.input, tld.currentImg.input, xFI, xFI, xFISize, xFISize, 0);
 
 	double medFB = median(xFJ.leftCols(xFISize).row(2));
 

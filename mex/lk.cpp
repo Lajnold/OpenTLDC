@@ -31,12 +31,9 @@
 #endif
 #include "mex.h"
 
-const int MAX_COUNT = 500;
-const int MAX_IMG = 2;
-int win_size = 4;
-CvPoint2D32f* points[3] = { 0, 0, 0 };
-static IplImage **IMG = 0;
-static IplImage **PYR = 0;
+using namespace tld;
+
+static const int WIN_SIZE = 4;
 
 void euclideanDistance(CvPoint2D32f *point1, CvPoint2D32f *point2,
 		float *match, int nPts) {
@@ -50,7 +47,7 @@ void euclideanDistance(CvPoint2D32f *point1, CvPoint2D32f *point2,
 	}
 }
 
-void normCrossCorrelation(IplImage *imgI, IplImage *imgJ,
+void normCrossCorrelation(IplImage *prevImg, IplImage *currImg,
 		CvPoint2D32f *points0, CvPoint2D32f *points1, int nPts, char *status,
 		float *match, int winsize, int method) {
 
@@ -60,8 +57,8 @@ void normCrossCorrelation(IplImage *imgI, IplImage *imgJ,
 
 	for (int i = 0; i < nPts; i++) {
 		if (status[i] == 1) {
-			cvGetRectSubPix(imgI, rec0, points0[i]);
-			cvGetRectSubPix(imgJ, rec1, points1[i]);
+			cvGetRectSubPix(prevImg, rec0, points0[i]);
+			cvGetRectSubPix(currImg, rec1, points1[i]);
 			cvMatchTemplate(rec0, rec1, res, method);
 			match[i] = ((float *) (res->imageData))[0];
 
@@ -76,30 +73,8 @@ void normCrossCorrelation(IplImage *imgI, IplImage *imgJ,
 }
 
 // Lucas-Kanade
-void lkInit() {
-	if (IMG != 0 && PYR != 0) {
-
-		for (int i = 0; i < MAX_IMG; i++) {
-			cvReleaseImage(&(IMG[i]));
-			IMG[i] = 0;
-			cvReleaseImage(&(PYR[i]));
-			PYR[i] = 0;
-		}
-		free(IMG);
-		IMG = 0;
-		free(PYR);
-		PYR = 0;
-	}
-
-	IMG = (IplImage**) calloc(MAX_IMG, sizeof(IplImage*));
-	PYR = (IplImage**) calloc(MAX_IMG, sizeof(IplImage*));
-
-	return;
-}
-
-// Lucas-Kanade
-Eigen::Matrix<double, 4, 150> lk2(IplImage* imgI, IplImage* imgJ, Eigen::Matrix<double, 2,
-		150> const & pointsI, Eigen::Matrix<double, 2, 150> const & pointsJ,
+Eigen::Matrix<double, 4, 150> lk2(TldStruct &tld, IplImage* prevImg, IplImage* currImg,
+		Eigen::Matrix<double, 2, 150> const & pointsI, Eigen::Matrix<double, 2, 150> const & pointsJ,
 		unsigned int sizeI, unsigned int sizeJ, unsigned int level) {
 
 	double nan = std::numeric_limits<double>::quiet_NaN();
@@ -115,25 +90,6 @@ Eigen::Matrix<double, 4, 150> lk2(IplImage* imgI, IplImage* imgJ, Eigen::Matrix<
 	int J = 1;
 	int Winsize = 10;
 
-	// Images
-	if (IMG[I] != 0) {
-		IMG[I] = imgI;
-	} else {
-		CvSize imageSize = cvGetSize(imgI);
-		IMG[I] = cvCreateImage(imageSize, 8, 1);
-		PYR[I] = cvCreateImage(imageSize, 8, 1);
-		IMG[I] = imgI;
-	}
-
-	if (IMG[J] != 0) {
-		IMG[J] = imgJ;
-	} else {
-		CvSize imageSize = cvGetSize(imgJ);
-		IMG[J] = cvCreateImage(imageSize, 8, 1);
-		PYR[J] = cvCreateImage(imageSize, 8, 1);
-		IMG[J] = imgJ;
-	}
-
 	// Points
 	int nPts = sizeI;
 
@@ -142,6 +98,7 @@ Eigen::Matrix<double, 4, 150> lk2(IplImage* imgI, IplImage* imgJ, Eigen::Matrix<
 		return Eigen::MatrixXd::Zero(1, 1);
 	}
 
+	CvPoint2D32f* points[3];
 	points[0] = (CvPoint2D32f*) cvAlloc(nPts * sizeof(CvPoint2D32f)); // template
 	points[1] = (CvPoint2D32f*) cvAlloc(nPts * sizeof(CvPoint2D32f)); // target
 	points[2] = (CvPoint2D32f*) cvAlloc(nPts * sizeof(CvPoint2D32f)); // forward-backward
@@ -155,21 +112,27 @@ Eigen::Matrix<double, 4, 150> lk2(IplImage* imgI, IplImage* imgJ, Eigen::Matrix<
 		points[2][i].y = pointsI(1, i);
 	}
 
+	IplImage *prevPyr = tld.lkData.pyramid;
+	if(!prevPyr)
+		prevPyr = cvCreateImage(cvGetSize(prevImg), 8, 1);
+
+	IplImage *currPyr = cvCreateImage(cvGetSize(currImg), 8, 1);
+
 	float *ncc = (float*) cvAlloc(nPts * sizeof(float));
 	float *fb = (float*) cvAlloc(nPts * sizeof(float));
 	char *status = (char*) cvAlloc(nPts);
 
-	cvCalcOpticalFlowPyrLK(IMG[I], IMG[J], PYR[I], PYR[J], points[0],
-			points[1], nPts, cvSize(win_size, win_size), Level, status, 0,
+	cvCalcOpticalFlowPyrLK(prevImg, currImg, prevPyr, currPyr, points[0],
+			points[1], nPts, cvSize(WIN_SIZE, WIN_SIZE), Level, status, 0,
 			cvTermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, 20, 0.03),
 			CV_LKFLOW_INITIAL_GUESSES);
-	cvCalcOpticalFlowPyrLK(IMG[J], IMG[I], PYR[J], PYR[I], points[1],
-			points[2], nPts, cvSize(win_size, win_size), Level, 0, 0,
+	cvCalcOpticalFlowPyrLK(currImg, prevImg, currPyr, prevPyr, points[1],
+			points[2], nPts, cvSize(WIN_SIZE, WIN_SIZE), Level, 0, 0,
 			cvTermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, 20, 0.03),
 			CV_LKFLOW_INITIAL_GUESSES | CV_LKFLOW_PYR_A_READY
 					| CV_LKFLOW_PYR_B_READY );
 
-	normCrossCorrelation(IMG[I], IMG[J], points[0], points[1], nPts, status,
+	normCrossCorrelation(prevImg, currImg, points[0], points[1], nPts, status,
 			ncc, Winsize, CV_TM_CCOEFF_NORMED);
 	euclideanDistance(points[0], points[2], fb, nPts);
 
@@ -189,6 +152,13 @@ Eigen::Matrix<double, 4, 150> lk2(IplImage* imgI, IplImage* imgJ, Eigen::Matrix<
 			output(3, i) = nan;
 		}
 	}
+
+	cvFree(&points[0]);
+	cvFree(&points[1]);
+	cvFree(&points[2]);
+
+	cvReleaseImage(&prevPyr);
+	tld.lkData.pyramid = currPyr;
 
 	return output;
 }

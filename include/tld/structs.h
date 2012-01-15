@@ -124,6 +124,17 @@ struct Detection {
 	Eigen::Matrix<double, (TLD_PATCHSIZE * TLD_PATCHSIZE), TLD_MAXDT> patch;
 };
 
+struct LKData {
+	IplImage *pyramid;
+
+	LKData() : pyramid(0) { }
+
+	~LKData() {
+		if(pyramid)
+			cvReleaseImage(&pyramid);
+	}
+};
+
 // Structure of TLD
 struct TldStruct {
 	Model model;
@@ -134,6 +145,8 @@ struct TldStruct {
 	N_par n_par;
 	Tracker tracker;
 	Control control;
+
+	LKData lkData;
 
 	Eigen::Matrix<double, 4 * TLD_NFEATURES, TLD_NTREES> features;
 	int nGrid;

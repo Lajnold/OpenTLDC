@@ -31,8 +31,7 @@
 #include "tld/structs.h"
 
 /* lucas kanade */
-void lkInit();
-Eigen::Matrix<double, 4, 150> lk2(IplImage* imgI, IplImage* imgJ,
+Eigen::Matrix<double, 4, 150> lk2(tld::TldStruct &tld, IplImage* imgI, IplImage* imgJ,
 		Eigen::Matrix<double, 2, 150> const & pointsI, Eigen::Matrix<double, 2,
 				150> const & pointsJ, unsigned int sizeI, unsigned int sizeJ,
 		unsigned int level);
