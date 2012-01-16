@@ -30,9 +30,6 @@
 #include <opencv/cvaux.h>
 #include <opencv/highgui.h>
 
-#include <Eigen/Dense>
-#include <Eigen/Core>
-
 #include "tld/ImageSource.h"
 #include "tld/structs.h"
 #include "tld/tldconst.h"
@@ -55,7 +52,7 @@ void tldInitDefaultTldStruct(TldStruct& tld);
 bool tldProcessFrame(TldStruct& tld);
 
 /** Sets a new bounding box for the object. */
-void tldSetBB(TldStruct& tld, Eigen::Vector4d& bb);
+void tldSetBB(TldStruct& tld, int x, int y, int width, int height);
 
 /** Sets the image source. */
 void tldSetImageSource(TldStruct& tld, ImageSource *src);

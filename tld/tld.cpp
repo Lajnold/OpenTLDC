@@ -1201,8 +1201,8 @@ bool tldProcessFrame(TldStruct& tld) {
 	return true;
 }
 
-void tldSetBB(TldStruct& tld, Vector4d& bb) {
-	tld.cfg.newBB = bb;
+void tldSetBB(TldStruct& tld, int x, int y, int width, int height) {
+	tld.cfg.newBB = Vector4d(x, y, x + width, y + height);
 	tld.cfg.newBBSet= true;
 }
 

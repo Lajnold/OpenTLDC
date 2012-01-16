@@ -34,8 +34,7 @@ int main(int argc, char* argv[]) {
 
 	std::string videopath = "";
 	int camindex = -1, startFrame = 0;
-	Eigen::Vector4d initBB;
-	initBB << -1, -1, -1, -1;
+	int x0 = -1, x1 = -1, y0 = -1, y1 = -1;
 	unsigned int nodisplay = 0;
 	CvCapture *captureSource;
 
@@ -56,20 +55,14 @@ int main(int argc, char* argv[]) {
 				continue;
 			}
 		} else if (current == "-x") {
-			if (i + 2 <= argc && initBB(0) == -1 && initBB(2) == -1) {
-				initBB(0) = std::min(double(atoi(argv[i + 1])), double(atoi(
-						argv[i + 2])));
-
-				initBB(2) = std::max(double(atoi(argv[i + 1])), double(atoi(
-						argv[i + 2])));
+			if (i + 2 <= argc && x0 == -1 && x1 == -1) {
+				x0 = std::min(double(atoi(argv[i + 1])), double(atoi(argv[i + 2])));
+				x1 = std::max(double(atoi(argv[i + 1])), double(atoi(argv[i + 2])));
 			}
 		} else if (current == "-y") {
-			if (i + 2 <= argc && initBB(1) == -1 && initBB(3) == -1) {
-				initBB(1) = std::min(double(atoi(argv[i + 1])), double(atoi(
-						argv[i + 2])));
-
-				initBB(3) = std::max(double(atoi(argv[i + 1])), double(atoi(
-						argv[i + 2])));
+			if (i + 2 <= argc && y0 == -1 && y1 == -1) {
+				y0 = std::min(double(atoi(argv[i + 1])), double(atoi(argv[i + 2])));
+				y1 = std::max(double(atoi(argv[i + 1])), double(atoi(argv[i + 2])));
 			}
 		} else if (current == "-nodisplay") {
 			nodisplay = 1;
@@ -87,8 +80,7 @@ int main(int argc, char* argv[]) {
 		exit(0);
 	}
 
-	if (initBB(0) == -1 || initBB(1) == -1 || initBB(2) == -1 || initBB(3)
-			== -1) {
+	if (x0 == -1 || x1 == -1 || y0 == -1 || y1 == -1) {
 		std::cout << "No bounding box specified.\n";
 		exit(0);
 	}
@@ -112,7 +104,7 @@ int main(int argc, char* argv[]) {
 
 	tldInitDefaultTldStruct(tldStruct);
 	tldSetImageSource(tldStruct, &imgsource);
-	tldSetBB(tldStruct, initBB);
+	tldSetBB(tldStruct, x0, y0, x1 - x0, y1 - y0);
 
 	for(int i = 0; i < startFrame; i++) {
 		// Ignore all frames up to startFrame.
