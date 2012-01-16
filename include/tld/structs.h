@@ -125,13 +125,16 @@ struct Detection {
 };
 
 struct LKData {
-	IplImage *pyramid;
+	IplImage *pyramid1;
+	IplImage *pyramid2;
 
-	LKData() : pyramid(0) { }
+	LKData() : pyramid1(0), pyramid2(0) { }
 
 	~LKData() {
-		if(pyramid)
-			cvReleaseImage(&pyramid);
+		if(pyramid1)
+			cvReleaseImage(&pyramid1);
+		if(pyramid2)
+			cvReleaseImage(&pyramid2);
 	}
 };
 

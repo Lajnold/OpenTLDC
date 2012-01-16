@@ -112,15 +112,17 @@ Eigen::Matrix<double, 4, 150> lk2(TldStruct &tld, IplImage* prevImg, IplImage* c
 		points[2][i].y = pointsI(1, i);
 	}
 
-	IplImage *prevPyr = tld.lkData.pyramid;
+	IplImage *prevPyr = tld.lkData.pyramid1;
 	if(!prevPyr)
-		prevPyr = cvCreateImage(cvGetSize(prevImg), 8, 1);
+		tld.lkData.pyramid1 = prevPyr = cvCreateImage(cvGetSize(prevImg), 8, 1);
 
-	IplImage *currPyr = cvCreateImage(cvGetSize(currImg), 8, 1);
+	IplImage *currPyr = tld.lkData.pyramid2;
+	if(!currPyr)
+		tld.lkData.pyramid2 = currPyr = cvCreateImage(cvGetSize(currImg), 8, 1);
 
-	float *ncc = (float*) cvAlloc(nPts * sizeof(float));
-	float *fb = (float*) cvAlloc(nPts * sizeof(float));
-	char *status = (char*) cvAlloc(nPts);
+	float *ncc = new float[nPts];
+	float *fb = new float[nPts];
+	char *status = new char[nPts];
 
 	cvCalcOpticalFlowPyrLK(prevImg, currImg, prevPyr, currPyr, points[0],
 			points[1], nPts, cvSize(WIN_SIZE, WIN_SIZE), Level, status, 0,
@@ -157,8 +159,9 @@ Eigen::Matrix<double, 4, 150> lk2(TldStruct &tld, IplImage* prevImg, IplImage* c
 	cvFree(&points[1]);
 	cvFree(&points[2]);
 
-	cvReleaseImage(&prevPyr);
-	tld.lkData.pyramid = currPyr;
+	delete[] ncc;
+	delete[] fb;
+	delete[] status;
 
 	return output;
 }
