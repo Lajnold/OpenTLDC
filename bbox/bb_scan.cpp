@@ -71,13 +71,14 @@ void bb_scan(tld::TldStruct& tld, Eigen::Vector4d const & bb,
 	for (unsigned int i = 0; i < 21; i++) {
 		if (bbW(i) < minBB || bbH(i) < minBB)
 			continue;
-		double val = bbF(0);
 		Eigen::VectorXd left(1);
 		Eigen::VectorXd leftbak(1);
 		Eigen::VectorXd top(1);
 		Eigen::VectorXd topbak(1);
+		double val;
 
-		for (unsigned int p = 0; val < bbF(2) - bbW(i) - 1; val += bbSHW(i), p++) {
+		val = bbF(0);
+		for (unsigned int p = 0; val <= bbF(2) - bbW(i) - 1; val += bbSHW(i), p++) {
 			leftbak.resize(left.size());
 			leftbak = left;
 			left.resize(p + 1);
@@ -86,13 +87,9 @@ void bb_scan(tld::TldStruct& tld, Eigen::Vector4d const & bb,
 			else
 				left(0) = floor(val + 0.5);
 		}
-		leftbak.resize(left.size());
-		leftbak = left;
-		left.resize(left.size() + 1);
-		left << leftbak, (bbF(2) - bbW(i) - 1);
-		val = bbF(1);
 
-		for (unsigned int p = 0; val < bbF(3) - bbH(i) - 1; val += bbSHH(i), p++) {
+		val = bbF(1);
+		for (unsigned int p = 0; val <= bbF(3) - bbH(i) - 1; val += bbSHH(i), p++) {
 			topbak.resize(top.size());
 			topbak = top;
 			top.resize(p + 1);
@@ -102,10 +99,6 @@ void bb_scan(tld::TldStruct& tld, Eigen::Vector4d const & bb,
 				top(0) = floor(val + 0.5);
 		}
 
-		topbak.resize(top.size());
-		topbak = top;
-		top.resize(top.size() + 1);
-		top << topbak, (bbF(3) - bbH(i) - 1);
 		Eigen::MatrixXd grid(2, top.size() * left.size());
 
 		unsigned int cnt = 0;
