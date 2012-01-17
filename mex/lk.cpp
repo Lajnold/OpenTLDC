@@ -114,11 +114,11 @@ Eigen::Matrix<double, 4, 150> lk2(TldStruct &tld, IplImage* prevImg, IplImage* c
 
 	IplImage *prevPyr = tld.lkData.pyramid1;
 	if(!prevPyr)
-		tld.lkData.pyramid1 = prevPyr = cvCreateImage(cvGetSize(prevImg), 8, 1);
+		tld.lkData.pyramid1 = prevPyr = cvCreateImage(cvSize(prevImg->width + 8, prevImg->height / 3), 8, 1);
 
 	IplImage *currPyr = tld.lkData.pyramid2;
 	if(!currPyr)
-		tld.lkData.pyramid2 = currPyr = cvCreateImage(cvGetSize(currImg), 8, 1);
+		tld.lkData.pyramid2 = currPyr = cvCreateImage(cvSize(currImg->width + 8, currImg->height / 3), 8, 1);
 
 	float *ncc = new float[nPts];
 	float *fb = new float[nPts];
