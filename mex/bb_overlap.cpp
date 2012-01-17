@@ -85,11 +85,9 @@ Eigen::MatrixXd bb_overlap(
 	Eigen::MatrixXd out(N, NN);
 
 
-	int counter = 0;
-	for (int j = 0; j < NN; j++) {
-		for (int i = 0; i < N; i++) {
-			out(i, counter) = bb_overlaphelper(bb.col(i), bb1.col(j));
-			counter++;
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < NN; j++) {
+			out(i, j) = bb_overlaphelper(bb.col(i), bb1.col(j));
 		}
 	}
 
