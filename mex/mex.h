@@ -40,7 +40,7 @@ Eigen::Matrix<double, 4, 150> lk2(tld::TldStruct &tld, IplImage* imgI, IplImage*
 void fern1(tld::FernData &fernData, IplImage* source,
 		Eigen::Matrix<double, 6, Eigen::Dynamic> const & grid, Eigen::Matrix<
 				double, 4 * TLD_NFEATURES, TLD_NTREES> const & features, Eigen::Matrix<
-				double, 2, 21> const & scales);
+				double, 2, Eigen::Dynamic> const & scales);
 
 Eigen::RowVectorXd fern2(tld::FernData &fernData, Eigen::Matrix<double, 10, Eigen::Dynamic> const & X,
 		Eigen::VectorXd const & Y, double margin, unsigned char bootstrap,

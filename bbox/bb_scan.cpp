@@ -66,15 +66,15 @@ void bb_scan(tld::TldStruct& tld, Eigen::Vector4d const & bb,
 	bbF << 2, 2, imsize(0), imsize(1);
 	Eigen::Matrix<double, 6, Eigen::Dynamic> bbs;
 	Eigen::Matrix<double, 6, Eigen::Dynamic> bbsbak;
-	Eigen::MatrixXd sca(2, 21);
+	Eigen::Matrix<double, 2, Eigen::Dynamic> sca;
 	//create a grid of bounding boxes with different scales
-	for (unsigned int i = 0; i < 21; i++) {
+	for (unsigned int i = 0, last_scale = 0; i < 21; i++) {
 		if (bbW(i) < minBB || bbH(i) < minBB)
 			continue;
-		Eigen::VectorXd left(1);
-		Eigen::VectorXd leftbak(1);
-		Eigen::VectorXd top(1);
-		Eigen::VectorXd topbak(1);
+		Eigen::VectorXd left;
+		Eigen::VectorXd leftbak;
+		Eigen::VectorXd top;
+		Eigen::VectorXd topbak;
 		double val;
 
 		val = bbF(0);
@@ -88,6 +88,9 @@ void bb_scan(tld::TldStruct& tld, Eigen::Vector4d const & bb,
 				left(0) = floor(val + 0.5);
 		}
 
+		if(left.size() == 0)
+			continue;
+
 		val = bbF(1);
 		for (unsigned int p = 0; val <= bbF(3) - bbH(i) - 1; val += bbSHH(i), p++) {
 			topbak.resize(top.size());
@@ -98,6 +101,9 @@ void bb_scan(tld::TldStruct& tld, Eigen::Vector4d const & bb,
 			else
 				top(0) = floor(val + 0.5);
 		}
+
+		if(top.size() == 0)
+			continue;
 
 		Eigen::MatrixXd grid(2, top.size() * left.size());
 
@@ -114,7 +120,7 @@ void bb_scan(tld::TldStruct& tld, Eigen::Vector4d const & bb,
 		bbsnew.row(1) = grid.row(0);
 		bbsnew.row(2) = grid.array().row(1) + bbW(i) - 1;
 		bbsnew.row(3) = grid.array().row(0) + bbH(i) - 1;
-		bbsnew.row(4) = Eigen::MatrixXd::Constant(1, grid.cols(), i + 1);
+		bbsnew.row(4) = Eigen::MatrixXd::Constant(1, grid.cols(), last_scale + 1);
 		bbsnew.row(5) = Eigen::MatrixXd::Constant(1, grid.cols(), left.size());
 		bbsbak.resize(6, bbs.cols());
 		bbsbak = bbs;
@@ -125,8 +131,11 @@ void bb_scan(tld::TldStruct& tld, Eigen::Vector4d const & bb,
 		else
 			bbs = bbsnew;
 		//save the scales on x and y axis
-		sca(0, i) = bbH(i);
-		sca(1, i) = bbW(i);
+		sca.conservativeResize(2, sca.cols() + 1);
+		sca(0, sca.cols() - 1) = bbH(i);
+		sca(1, sca.cols() - 1) = bbW(i);
+
+		last_scale++;
 	}
 	tld.grid = bbs;
 	tld.nGrid = bbs.cols();

@@ -194,7 +194,7 @@ struct TldStruct {
 	int nGrid;
 
 	Eigen::Matrix<double, 6, Eigen::Dynamic> grid;
-	Eigen::Matrix<double, 2, 21> scales;
+	Eigen::Matrix<double, 2, Eigen::Dynamic> scales;
 
 	ImgType prevImg;
 	ImgType currentImg;

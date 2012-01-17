@@ -244,7 +244,7 @@ double measure_bbox_offset(FernData &fernData, IplImage *blur, int idx_bbox, dou
 void fern1(FernData &fernData, IplImage* source,
 		Eigen::Matrix<double, 6, Eigen::Dynamic> const & grid, Eigen::Matrix<
 				double, 4 * TLD_NFEATURES, TLD_NTREES> const & features, Eigen::Matrix<
-				double, 2, 21> const & scales) {
+				double, 2, Eigen::Dynamic> const & scales) {
 
 	fernData.imgHeight = source->height;
 	fernData.imgWidth = source->width;
