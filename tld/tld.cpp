@@ -660,14 +660,14 @@ void tldGenerateFeatures(TldStruct& tld, unsigned int nTREES,
 	y = permutate_cols(y);
 
 	// cut first elements with length of nFEAT times nTREES
-	y = y.block(0, 0, 4, (nFEAT * nTREES));
+	Matrix4Xd y2 = y.block(0, 0, 4, (nFEAT * nTREES));
 
 	MatrixXd z(4 * nFEAT, nTREES); // 52 x 10
 
 	// reshape
 	for (unsigned int i = 0; i < nTREES; i++)
 		for (p = 0; p < nFEAT; p++)
-			z.block(p * 4, i, 4, 1) = y.block(0, i * nFEAT + p, 4, 1);
+			z.block(p * 4, i, 4, 1) = y2.block(0, i * nFEAT + p, 4, 1);
 
 	tld.features = z;
 
