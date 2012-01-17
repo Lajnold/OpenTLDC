@@ -1271,28 +1271,22 @@ VectorXd tldTracking(TldStruct& tld, VectorXd const & bb, int i, int j) {
 	xFJ = lk2(tld, tld.prevImg.input, tld.currentImg.input, xFI, xFI, xFISize, xFISize, 0);
 
 	double medFB = median(xFJ.leftCols(xFISize).row(2));
-
 	double medNCC = median(xFJ.leftCols(xFISize).row(3));
 
 	int counter = 0;
 	//get indexes of reliable points
-	VectorXd idxF(1);
-	VectorXd idxFbak(1);
+	VectorXd idxF;
+	VectorXd idxFbak;
 	for (int n = 0; n < xFISize; n++) {
 		if (xFJ(2, n) <= medFB && xFJ(3, n) >= medNCC) {
-			if (counter == 0) {
-				idxF(0) = n;
-			} else {
-				idxFbak.resize(idxF.size());
-				idxFbak = idxF;
-
-				idxF.resize(idxF.size() + 1);
-				idxF.topRows(counter) = idxFbak;
-				idxF(counter) = n;
-			}
+			idxF.conservativeResize(idxF.size() + 1);
+			idxF(counter) = n;
 			counter++;
 		}
 	}
+
+	if (idxF.size() == 0)
+		return Vector4d::Constant(std::numeric_limits<double>::quiet_NaN());
 
 	MatrixXd xFInew(xFI.rows(), idxF.rows());
 
