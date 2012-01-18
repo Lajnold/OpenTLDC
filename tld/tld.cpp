@@ -912,7 +912,7 @@ void tldLearning(TldStruct& tld, unsigned long I) {
 	MatrixXd nn = tldNN(pPatt, tld);
 
 	if (nn(0, 0) < 0.5) {
-		std::cout << "Fast change" << std::endl;
+		//std::cout << "Fast change" << std::endl;
 		tld.currentValid = false;
 		return;
 	}
@@ -922,13 +922,13 @@ void tldLearning(TldStruct& tld, unsigned long I) {
 	pPattVec = pPatt.col(0);
 
 	if (variance(pPattVec, patRows) < tld.var) {
-		std::cout << "Low variance" << std::endl;
+		//std::cout << "Low variance" << std::endl;
 		tld.currentValid = false;
 		return;
 	}
 
 	if (nn(2, 2) == 1) {
-		std::cout << "In negative data" << std::endl;
+		//std::cout << "In negative data" << std::endl;
 		tld.currentValid = false;
 		return;
 	}
