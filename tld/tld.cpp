@@ -77,7 +77,7 @@ void tldLearning(TldStruct& tld, unsigned long I);
 
 Matrix<double, 3, Dynamic> tldNN(Matrix<double, TLD_PATCHSIZE * TLD_PATCHSIZE, Dynamic> const & nEx2, TldStruct& tld);
 
-Matrix<double, TLD_PATCHSIZE * TLD_PATCHSIZE, 1> tldPatch2Pattern(CvImage patch, Patchsize const& patchsize); 
+Matrix<double, TLD_PATCHSIZE * TLD_PATCHSIZE, 1> tldPatch2Pattern(const cv::Mat &patch, Patchsize const& patchsize);
 
 void tldSplitNegativeData(Matrix<double, TLD_NTREES, Dynamic> const & nX, Matrix<double, TLD_PATCHSIZE * TLD_PATCHSIZE, Dynamic> const & nEx, Matrix<double, TLD_NTREES, Dynamic>& spnX, Matrix<double, TLD_PATCHSIZE * TLD_PATCHSIZE, Dynamic>& spnEx);
 
@@ -92,16 +92,16 @@ void tldTrainNN(Matrix<double, TLD_PATCHSIZE * TLD_PATCHSIZE, Dynamic> const & p
  * @param img output image
  * @param tld learned structures
  */
-static void embedPex(CvImage img, TldStruct& tld) {
+static void embedPex(cv::Mat img, TldStruct& tld) {
 
 
 	double rescale = tld.cfg.plot.patch_rescale;
 
 	// measure number of possible rows of patches
-	int nrow = floor(tld.currentImg.input.height() / (rescale * tld.model.patchsize.y));
+	int nrow = floor(tld.currentImg.input.rows / (rescale * tld.model.patchsize.y));
 
 	// measure number of possible columns of patches
-	int ncol = floor(tld.currentImg.input.width() / (rescale * tld.model.patchsize.x));
+	int ncol = floor(tld.currentImg.input.cols / (rescale * tld.model.patchsize.x));
 
 	// get prepared Eigen Matrix
 	MatrixXd pex;
@@ -116,9 +116,8 @@ static void embedPex(CvImage img, TldStruct& tld) {
 
 	// include in output image
 	for (int y = 0; y < pH; y++)
-		for (int x = img.width() - pW; x < img.width(); x++) {
-			((uchar*) (img.data() + img.step() * (y)))[x] = 255 * pex(
-					y, x - (img.width() - pW));
+		for (int x = img.cols - pW; x < img.cols; x++) {
+			((uchar*) (img.ptr(y)))[x] = 255 * pex(y, x - (img.cols - pW));
 
 		}
 }
@@ -129,15 +128,15 @@ static void embedPex(CvImage img, TldStruct& tld) {
  * @param img output image
  * @param tld learned structures
  */
-static void embedNex(CvImage img, TldStruct& tld) {
+static void embedNex(cv::Mat img, TldStruct& tld) {
 
 	double rescale = tld.cfg.plot.patch_rescale;
 
 	// measure number of possible rows of patches
-	int nrow = floor(tld.currentImg.input.height() / (rescale * tld.model.patchsize.y));
+	int nrow = floor(tld.currentImg.input.rows / (rescale * tld.model.patchsize.y));
 
 	// measure number of possible columns of patches
-	int ncol = floor(tld.currentImg.input.width() / (rescale * tld.model.patchsize.x));
+	int ncol = floor(tld.currentImg.input.cols / (rescale * tld.model.patchsize.x));
 
 	// get prepared Eigen Matrix
 	MatrixXd nex;
@@ -153,8 +152,7 @@ static void embedNex(CvImage img, TldStruct& tld) {
 	// include in output image
 	for (int y = 0; y < pH; y++)
 		for (int x = 0; x < pW; x++) {
-			((uchar*) (img.data() + img.step() * (y)))[x]
-					= 255 * nex(y, x);
+			((uchar*) (img.ptr(y)))[x] = 255 * nex(y, x);
 		}
 }
 
@@ -273,20 +271,20 @@ Matrix<double, 20, 1> tldDetection(TldStruct& tld, int i, Matrix<
  */
 void tldDisplay(int i, unsigned long index, TldStruct& tld, double fps) {
 
-	CvImage inputClone = tld.currentImg.input.clone();
+	cv::Mat inputClone = tld.currentImg.input.clone();
 
 	if (i == 0) {
 
 		// draw bounding box
 		bb_draw_add_color(inputClone, tld.currentBB);
 
-		tld.handle = CvImage(inputClone.size(), tld.cfg.imgsource->getImage().depth(), 3);
+		tld.handle = cv::Mat(inputClone.rows, inputClone.cols, tld.cfg.imgsource->getImage().type());
 
-		cvCvtColor(inputClone, tld.handle, CV_GRAY2BGR);
+		cv::cvtColor(inputClone, tld.handle, CV_GRAY2BGR);
 
-		cvNamedWindow("Result", CV_WINDOW_AUTOSIZE);
+		cv::namedWindow("Result", CV_WINDOW_AUTOSIZE);
 
-		cvShowImage("Result", tld.handle);
+		cv::imshow("Result", tld.handle);
 		if (cv::waitKey(10) >= 0)
 			std::cout << "key pressed" << std::endl;
 	} else {
@@ -299,18 +297,15 @@ void tldDisplay(int i, unsigned long index, TldStruct& tld, double fps) {
 		if (tld.cfg.plot.nex == 1)
 			embedNex(inputClone, tld);
 
-		CvFont font;
 		fps = 1 / fps;
 		std::ostringstream fpsc;
 		fpsc << fps;
-		cvInitFont(&font, CV_FONT_HERSHEY_SIMPLEX, 1.0, 1.0, 0, 1, CV_AA);
 
-		tld.handle = CvImage(inputClone.size(), tld.cfg.imgsource->getImage().depth(), 3);
-		cvCvtColor(inputClone, tld.handle, CV_GRAY2BGR); // colored output image
+		tld.handle = cv::Mat(inputClone.rows, inputClone.cols, tld.cfg.imgsource->getImage().type());
+		cv::cvtColor(inputClone, tld.handle, CV_GRAY2BGR); // colored output image
 
 		// put fps
-		cvPutText(tld.handle, (fpsc.str()).c_str(), cvPoint(
-				40, 40), &font, cvScalar(0, 0, 255, 0));
+		cv::putText(tld.handle, fpsc.str(), cv::Point(40, 40), CV_FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 0, 255, 0));
 
 		unsigned char size = 100;
 
@@ -322,17 +317,14 @@ void tldDisplay(int i, unsigned long index, TldStruct& tld, double fps) {
 			Vector4d bb = bb_rescalerel(tld.currentBB,
 					vecin);
 
-			CvImage patch = img_patch(tld.handle, bb);
-			CvImage dest = CvImage(cvSize((int) size, (int) size),
-					patch.depth(), patch.channels());
+			cv::Mat patch = img_patch(tld.handle, bb);
+			cv::Mat dest;
 
-			cvResize(patch, dest);
+			cv::resize(patch, dest, cv::Size((int) size, (int) size));
 
 			for (unsigned int y = 0; y < size; y++)
 				for (unsigned int x = 0; x < size; x++) {
-					((uchar*) (tld.handle.data() + tld.handle.step()
-							* (y)))[x] = ((uchar*) (dest.data()
-							+ dest.step() * (y)))[x];
+					((uchar*) (tld.handle.ptr(y)))[x] = ((uchar*) (dest.ptr(y)))[x];
 				}
 		}
 
@@ -346,24 +338,19 @@ void tldDisplay(int i, unsigned long index, TldStruct& tld, double fps) {
 			bb(3) = floor(tld.currentBB(3) + 0.5);
 
 			Vector2i imsize;
-			imsize << tld.currentImg.input.width(), tld.currentImg.input.height();
+			imsize << tld.currentImg.input.cols, tld.currentImg.input.rows;
 
 			if (bb_isin(bb, imsize)) {
 				unsigned int width = (int) (bb(2) - bb(0)) + 1;
 				unsigned int height = (int) (bb(3) - bb(1)) + 1;
 
-				CvImage patch = CvImage(cvSize(width, height),
-						tld.target.depth(), tld.target.channels());
-
-				cvResize(tld.target, patch);
+				cv::Mat patch;
+				cv::resize(tld.target, patch, cv::Size(width, height));
 
 				for (unsigned int y = bb(1); y <= bb(3); y++)
 					for (unsigned int x = bb(0); x <= bb(2); x++) {
-						((uchar*) (tld.handle.data()
-								+ tld.handle.step() * (y)))[x]
-								= ((uchar*) (patch.data()
-										+ patch.step() * (y - int(bb(1)))))[x
-										- int(bb(0))];
+						((uchar*) (tld.handle.ptr(y)))[x]
+								= ((uchar*) (patch.ptr(y - int(bb(1)))))[x - int(bb(0))];
 					}
 			}
 		}
@@ -391,7 +378,7 @@ void tldDisplay(int i, unsigned long index, TldStruct& tld, double fps) {
 			}
 		}
 
-		cvShowImage("Result", tld.handle);
+		cv::imshow("Result", tld.handle);
 		if (cv::waitKey(10) >= 0)
 			std::cout << "key pressed" << std::endl;
 
@@ -416,8 +403,8 @@ bool tldInit(TldStruct& tld) {
 	Vector4d bb = tld.cfg.newBB;
 
 	Vector2i imsize;
-	imsize(0) = tld.currentImg.input.width();
-	imsize(1) = tld.currentImg.input.height();
+	imsize(0) = tld.currentImg.input.cols;
+	imsize(1) = tld.currentImg.input.rows;
 	bb_scan(tld, bb, imsize, tld.model.min_win);
 
 	// Features
@@ -799,8 +786,8 @@ Vector4d tldGeneratePositiveData(TldStruct& tld,
 
 	// get a copy of current images
 	ImgType im1;
-	im1.input = cvCloneImage(img.input);
-	im1.blur = cvCloneImage(img.blur);
+	im1.input = img.input.clone();
+	im1.blur = img.blur.clone();
 
 	// get positive patches from image
 	pEx = tldGetPattern(im1, bbP0, tld.model.patchsize, 0);
@@ -823,15 +810,13 @@ Vector4d tldGeneratePositiveData(TldStruct& tld,
 			double randomize = uniform();
 
 			// warp image randomly
-			CvImage patch_blur = img_patch(img.blur, bbH, randomize, p_par);
+			cv::Mat patch_blur = img_patch(img.blur, bbH, randomize, p_par);
 
 			// include in in image
 			for (unsigned int y = bbH(1); y <= bbH(3); y++)
 				for (unsigned int x = bbH(0); x <= bbH(2); x++) {
-					((uchar*) (im1.blur.data() + im1.blur.step() * (y)))[x]
-							= ((uchar*) (patch_blur.data()
-									+ patch_blur.step() * (y - int(bbH(1)))))[x
-									- int(bbH(0))];
+					((uchar*) (im1.blur.ptr(y)))[x]
+							= ((uchar*) (patch_blur.ptr(y - int(bbH(1)))))[x - int(bbH(0))];
 				}
 		}
 
@@ -878,11 +863,11 @@ Matrix<double, (TLD_PATCHSIZE * TLD_PATCHSIZE), Dynamic> tldGetPattern(
 
 		// sample patch
 		Vector4d tmpbb = bb.col(i);
-		CvImage patch = img_patch(img.input, tmpbb);
+		cv::Mat patch = img_patch(img.input, tmpbb);
 
 		// flip if needed
 		if (flip) {
-			cvFlip(patch, NULL, 1);
+			cv::flip(patch, patch, 1);
 		}
 
 		// normalize size to 'patchsize' and nomalize intensities to ZMUV
@@ -1059,20 +1044,17 @@ Matrix<double, 3, Dynamic> tldNN(Matrix<double, TLD_PATCHSIZE
 }
 
 /* Converts an image to Eigen Matrix */
-Matrix<double, TLD_PATCHSIZE * TLD_PATCHSIZE, 1> tldPatch2Pattern(CvImage patch,
+Matrix<double, TLD_PATCHSIZE * TLD_PATCHSIZE, 1> tldPatch2Pattern(const cv::Mat &patch,
 		Patchsize const& patchsize) {
 
-	CvImage dest = CvImage(
-			cvSize((int) patchsize.x, (int) patchsize.y), patch.depth(),
-			patch.channels());
+	cv::Mat dest;
 
 	//bilinear' is faster
-	cvResize(patch, dest);
+	cv::resize(patch, dest, cv::Size((int) patchsize.x, (int) patchsize.y));
 	MatrixXd pattern(patchsize.x * patchsize.y, 1);
-	for (int x = 0; x < dest.width(); x++)
-		for (int y = 0; y < dest.height(); y++)
-			pattern(x*patchsize.x + y, 0) = double(((uchar*) (dest.data() + dest.step()
-					* (y)))[x]);
+	for (int x = 0; x < dest.cols; x++)
+		for (int y = 0; y < dest.rows; y++)
+			pattern(x*patchsize.x + y, 0) = double(((uchar*) (dest.ptr(y)))[x]);
 
 	// calculate column-wise mean
 	RowVectorXd mean(patchsize.x);
@@ -1082,23 +1064,14 @@ Matrix<double, TLD_PATCHSIZE * TLD_PATCHSIZE, 1> tldPatch2Pattern(CvImage patch,
 }
 
 bool tldProcessFrame(TldStruct& tld) {
-
-	tld.prevImg = tld.currentImg;
-
 	if(!tld.cfg.imgsource->nextImage())
 		return false;
 
 	tld.frameNumber++;
 
-	//Input image
-	ImgType im0;
-	im0.input = tld.cfg.imgsource->getGrayImage();
-
-	//Blurred image
-	im0.blur = img_blur(im0.input);
-
-	//color image with 3 channels
-	tld.currentImg = im0;
+	tld.prevImg = tld.currentImg;
+	tld.currentImg.input = tld.cfg.imgsource->getGrayImage();
+	tld.currentImg.blur = img_blur(tld.currentImg.input);
 
 	//switch from current to previous
 	/* bbox */
@@ -1303,8 +1276,8 @@ VectorXd tldTracking(TldStruct& tld, VectorXd const & bb, int i, int j) {
 
 	//bounding box out of image
 	Vector2i imgsize;
-	imgsize(0) = tld.currentImg.input.width();
-	imgsize(1) = tld.currentImg.input.height();
+	imgsize(0) = tld.currentImg.input.cols;
+	imgsize(1) = tld.currentImg.input.rows;
 	if (!bb_isdef(bb2) || bb_isout(bb2, imgsize)) {
 		bb2 = Vector4d::Constant(std::numeric_limits<double>::quiet_NaN());
 		return bb2;

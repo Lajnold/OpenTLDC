@@ -127,13 +127,13 @@ inline Eigen::Vector4d bb_rescalerel(Eigen::Vector4d const & bb,
 /**
  * The function draws a rectangle with coordinates given by a vector and a defined color.
  */
-inline void bb_draw(CvImage img, Eigen::Vector4d const & bb, cv::Scalar color,
+inline void bb_draw(cv::Mat img, Eigen::Vector4d const & bb, cv::Scalar color,
 		unsigned int linewidth) {
 	if (bb.isZero()) {
 		return;
 	} else {
 		if (bb(2) - bb(0) > 0 && bb(3) - bb(1) > 0) {
-			cvRectangle(img, cvPoint(bb(0), bb(1)), cvPoint(bb(2), bb(3)),
+			cv::rectangle(img, cv::Point(bb(0), bb(1)), cv::Point(bb(2), bb(3)),
 					color, linewidth, 8, 0);
 		} else {
 			return;
@@ -144,7 +144,7 @@ inline void bb_draw(CvImage img, Eigen::Vector4d const & bb, cv::Scalar color,
 /**
  * If no drawing color is set. It will be set to yellow.
  */
-inline void bb_draw_add_color(CvImage img, Eigen::Vector4d const & bb) {
+inline void bb_draw_add_color(cv::Mat img, Eigen::Vector4d const & bb) {
 	if (bb.isZero()) {
 		return;
 	} else {

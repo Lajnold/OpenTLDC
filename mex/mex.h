@@ -31,13 +31,13 @@
 #include "tld/structs.h"
 
 /* lucas kanade */
-Eigen::Matrix<double, 4, 150> lk2(tld::TldStruct &tld, IplImage* imgI, IplImage* imgJ,
+Eigen::Matrix<double, 4, 150> lk2(tld::TldStruct &tld, const cv::Mat &imgI, const cv::Mat &imgJ,
 		Eigen::Matrix<double, 2, 150> const & pointsI, Eigen::Matrix<double, 2,
 				150> const & pointsJ, unsigned int sizeI, unsigned int sizeJ,
 		unsigned int level);
 
 /* fern */
-void fern1(tld::FernData &fernData, IplImage* source,
+void fern1(tld::FernData &fernData, const cv::Mat &source,
 		Eigen::Matrix<double, 6, Eigen::Dynamic> const & grid, Eigen::Matrix<
 				double, 4 * TLD_NFEATURES, TLD_NTREES> const & features, Eigen::Matrix<
 				double, 2, Eigen::Dynamic> const & scales);
@@ -59,8 +59,7 @@ distance(Eigen::Matrix<double, (TLD_PATCHSIZE * TLD_PATCHSIZE), 1> const &x1,
 		Eigen::Matrix<double, (TLD_PATCHSIZE * TLD_PATCHSIZE), TLD_MAXPATCHES> const &x2,
 		int nx2, unsigned int flag);
 
-IplImage* warp(IplImage* img, Eigen::Matrix3d const & H,
-		Eigen::Vector4d const & box);
+cv::Mat warp(const cv::Mat & img, Eigen::Matrix3d const & H, Eigen::Vector4d const & box);
 
 Eigen::VectorXd
 bb_overlap(Eigen::Matrix<double, 4, Eigen::Dynamic> const & bb1);

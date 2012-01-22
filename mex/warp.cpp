@@ -96,29 +96,26 @@ void warp_image_roi(IplImage* image, int w, int h, Eigen::Matrix3d const & H,
 	}
 }
 
-IplImage* toIpl(const double *image, int num_cols, int num_rows) {
+cv::Mat toMat(const double *image, int num_cols, int num_rows) {
 
-	// convert to OpenCV IplImage
-
-	IplImage* result = cvCreateImage(cvSize(num_cols, num_rows), 8, 1);
-	int widthStep = result->widthStep;
+	cv::Mat result(num_rows, num_cols, CV_8UC1);
 	const double* s_ptr = image;
 
-	for (int i = 0; i < num_rows; i++)
-		for (int j = 0; j < num_cols; j++, s_ptr++){
-			result->imageData[i*widthStep+j] = (unsigned char) (*s_ptr);
+	for (int i = 0; i < num_rows; i++) {
+		for (int j = 0; j < num_cols; j++, s_ptr++) {
+			result.ptr(i)[j] = (unsigned char) (*s_ptr);
 		}
+	}
 
 	return result;
 }
 
-IplImage* warp(IplImage* img, Eigen::Matrix3d const & H, Eigen::Vector4d const & box) {
-
+cv::Mat warp(const cv::Mat & img, Eigen::Matrix3d const & H, Eigen::Vector4d const & box) {
 	int w, h;
 	double *result;
 	double xmin, xmax, ymin, ymax, fill;
-	w = img->width;
-	h = img->height;
+	w = img.cols;
+	h = img.rows;
 
 	xmin = box(0);
 	xmax = box(1);
@@ -128,11 +125,11 @@ IplImage* warp(IplImage* img, Eigen::Matrix3d const & H, Eigen::Vector4d const &
 	fill = 0;
 	result = new double[((int) (xmax - xmin + 1) * (int) (ymax - ymin + 1))];
 	{
-		warp_image_roi(img, w, h, H, xmin, xmax, ymin, ymax, fill, result);
+		IplImage iplImg = img;
+		warp_image_roi(&iplImg, w, h, H, xmin, xmax, ymin, ymax, fill, result);
 	}
 
-	IplImage* out = toIpl(result, (int) (xmax - xmin + 1), (int) (ymax - ymin
-			+ 1));
+	cv::Mat out = toMat(result, (int) (xmax - xmin + 1), (int) (ymax - ymin + 1));
 
 	delete[] result;
 

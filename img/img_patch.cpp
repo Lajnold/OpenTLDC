@@ -28,10 +28,10 @@
 #include "../bbox/bbox.h"
 #include "../mex/mex.h"
 
-CvImage img_patch(CvImage img, Eigen::Vector4d const & bb, double randomize,
+cv::Mat img_patch(const cv::Mat &img, Eigen::Vector4d const & bb, double randomize,
 		tld::P_par& p_par) {
 	if (randomize <= 0)
-		return CvImage();
+		return cv::Mat();
 
 	unsigned int NOISE = p_par.noise;
 	unsigned int ANGLE = p_par.angle;
@@ -69,20 +69,19 @@ CvImage img_patch(CvImage img, Eigen::Vector4d const & bb, double randomize,
 	H = Sh2 * Ang * Sca * Sh1;
 	//	    bbsize = bb_size(bb);
 	BBOXSIZE bbsize = bb_size(bb);
-	CvImage patch = warp(img, H.inverse(), box);
+	cv::Mat patch = warp(img, H.inverse(), box);
 	//	    patch = uint8(warp(img,inv(H),box) + NOISE*randn(bbsize(1),bbsize(2)));
 	Eigen::MatrixXd noisy = Eigen::MatrixXd::Random(bbsize.height, bbsize.width);
 	noisy = noisy.normalized() * NOISE;
 
-	for (int y = 0; y < patch.height(); y++)
-		for (int x = 0; x < patch.width(); x++)
-			((uchar*) (patch.data() + patch.step() * (y)))[x]
-					+= noisy(y, x);
+	for (int y = 0; y < patch.rows; y++)
+		for (int x = 0; x < patch.cols; x++)
+			((uchar*) (patch.ptr(y)))[x] += noisy(y, x);
 
 	return patch;
 }
 
-CvImage img_patch(CvImage img, Eigen::Vector4d const & bb) {
+cv::Mat img_patch(const cv::Mat &img, Eigen::Vector4d const & bb) {
 
 	Eigen::Vector4d rounded;
 	rounded(0) = floor(bb(0) + 0.5);
@@ -93,18 +92,16 @@ CvImage img_patch(CvImage img, Eigen::Vector4d const & bb) {
 	//	 % All coordinates are integers
 	//	    if sum(round(bb)-bb)==0
 	if ((rounded - bb).sum() == 0) {
-		unsigned int L = std::min(std::max(0, int(bb(0))), img.width());
-		unsigned int T = std::min(std::max(0, int(bb(1))), img.height());
-		unsigned int R = std::min(img.width() - 1, int(bb(2)));
-		unsigned int B = std::min(img.height() - 1, int(bb(3)));
-		CvImage patch = CvImage(cvSize((int) (R - L + 1), (int) (B - T + 1)), IPL_DEPTH_8U, 1);
+		unsigned int L = std::min(std::max(0, int(bb(0))), img.cols);
+		unsigned int T = std::min(std::max(0, int(bb(1))), img.rows);
+		unsigned int R = std::min(img.cols - 1, int(bb(2)));
+		unsigned int B = std::min(img.rows - 1, int(bb(3)));
+		cv::Mat patch = cv::Mat(B - T + 1, R - L + 1, CV_8UC1);
 
 		//	        patch = img(T:B,L:R);
 		for (unsigned int y = T; y <= B; y++)
 			for (unsigned int x = L; x <= R; x++)
-				((uchar*) (patch.data() + patch.step() * (y - T)))[x
-						- L]
-						= ((uchar*) (img.data() + img.step() * (y)))[x];
+				((uchar*) (patch.ptr(y - T)))[x - L] = ((uchar*) (img.ptr(y)))[x];
 
 		return patch;
 	} else {
@@ -126,7 +123,7 @@ CvImage img_patch(CvImage img, Eigen::Vector4d const & bb) {
 		double bbH = bb(3) - bb(1);
 		//	        if bbW <= 0 || bbH <= 0
 		if (bbW < 0 || bbH < 0)
-			return CvImage();
+			return cv::Mat();
 		//	            patch = [];
 		//	            return;
 		//	        end
@@ -138,7 +135,7 @@ CvImage img_patch(CvImage img, Eigen::Vector4d const & bb) {
 		// We always use one channel in color space
 		//	            patch = warp(img,inv(H),box);
 
-		CvImage patch = warp(img, H.inverse(), box);
+		cv::Mat patch = warp(img, H.inverse(), box);
 		return patch;
 
 	}

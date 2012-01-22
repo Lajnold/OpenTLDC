@@ -36,7 +36,7 @@ int main(int argc, char* argv[]) {
 	int camindex = -1, startFrame = 0;
 	int x0 = -1, x1 = -1, y0 = -1, y1 = -1;
 	unsigned int nodisplay = 0;
-	CvCapture *captureSource;
+	cv::VideoCapture captureSource;
 
 
 	for (int i = 1; i < argc; ++i) {
@@ -86,19 +86,24 @@ int main(int argc, char* argv[]) {
 	}
 
 	if(camindex >= 0)
-		captureSource = cvCaptureFromCAM(camindex);
+		captureSource.open(camindex);
 	else if(!videopath.empty())
-		captureSource = cvCaptureFromAVI(videopath.c_str());
+		captureSource.open(videopath);
 	else
 		assert(false && "No image source.");
 
-	CvCaptureImageSource imgsource(captureSource);
+	if(!captureSource.isOpened()) {
+		std::cout << "Could not open video source.\n";
+		exit(0);
+	}
+
+	CvCaptureImageSource imgsource(&captureSource);
 
 	for(int i = 0; i < startFrame; i++) {
 		// Ignore all frames up to startFrame.
 		if(!imgsource.nextImage()) {
-			cvReleaseCapture(&captureSource);
-			exit(0); // Ran out of images.
+			std::cout << "Not enough frames to handle.\n";
+			exit(0);
 		}
 	}
 
@@ -106,12 +111,5 @@ int main(int argc, char* argv[]) {
 	tldSetImageSource(tldStruct, &imgsource);
 	tldSetBB(tldStruct, x0, y0, x1 - x0, y1 - y0);
 
-	for(int i = 0; i < startFrame; i++) {
-		// Ignore all frames up to startFrame.
-		if(!tldStruct.cfg.imgsource->nextImage())
-			exit(0); // Ran out of images.
-	}
-
 	tldExample(tldStruct, !nodisplay);
-	cvReleaseCapture(&captureSource);
 }

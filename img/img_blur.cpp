@@ -23,18 +23,18 @@
 #include "img.h"
 
 //apply a gaussian filter to the image
-CvImage img_blur(CvImage image, int sigma){
-	int csize = 6* sigma;
-	CvImage out = CvImage(image.size(), 8, 1);
-	cvSmooth(image, out, CV_GAUSSIAN, csize, csize);
+cv::Mat img_blur(const cv::Mat &image, int sigma){
+	int csize = 6 * sigma;
+	cv::Mat out;
+	cv::GaussianBlur(image, out, cv::Size(csize, csize), 0);
 	return out;
 }
 
 //apply a gaussian filter to the image
-CvImage img_blur(CvImage image){
+cv::Mat img_blur(const cv::Mat &image){
 	int csize = 7;
-	CvImage out = CvImage(image.size(), 8, 1);
-	cvSmooth(image, out, CV_GAUSSIAN, csize, csize);
+	cv::Mat out;
+	cv::GaussianBlur(image, out, cv::Size(csize, csize), 0);
 	return out;
 }
 

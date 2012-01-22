@@ -62,8 +62,8 @@ struct Config {
 
 // Blured image and input image (grayscale)
 struct ImgType {
-	CvImage blur;
-	CvImage input;
+	cv::Mat blur;
+	cv::Mat input;
 };
 
 struct Patchsize {
@@ -124,20 +124,6 @@ struct Detection {
 	Eigen::Matrix<double, (TLD_PATCHSIZE * TLD_PATCHSIZE), TLD_MAXDT> patch;
 };
 
-struct LKData {
-	IplImage *pyramid1;
-	IplImage *pyramid2;
-
-	LKData() : pyramid1(0), pyramid2(0) { }
-
-	~LKData() {
-		if(pyramid1)
-			cvReleaseImage(&pyramid1);
-		if(pyramid2)
-			cvReleaseImage(&pyramid2);
-	}
-};
-
 struct Point {
 	int row;
 	int col;
@@ -187,7 +173,6 @@ struct TldStruct {
 	Tracker tracker;
 	Control control;
 
-	LKData lkData;
 	FernData fernData;
 
 	Eigen::Matrix<double, 4 * TLD_NFEATURES, TLD_NTREES> features;
@@ -206,7 +191,7 @@ struct TldStruct {
 	bool currentValid;
 	//double size;
 
-	CvImage target;
+	cv::Mat target;
 
 	int npex;
 	int nnex;
@@ -218,7 +203,7 @@ struct TldStruct {
 
 	double var;
 
-	CvImage handle;
+	cv::Mat handle;
 
 	int frameNumber;
 

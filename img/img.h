@@ -30,11 +30,11 @@
 
 #include "tld/structs.h"
 
-CvImage img_patch(CvImage img, Eigen::Vector4d const & bb, double randomize, tld::P_par& p_par);
+cv::Mat img_patch(const cv::Mat &img, Eigen::Vector4d const & bb, double randomize, tld::P_par& p_par);
 
-CvImage img_patch(CvImage img, Eigen::Vector4d const & bb);
+cv::Mat img_patch(const cv::Mat &img, Eigen::Vector4d const & bb);
 
-CvImage img_blur(CvImage image, int sigma);
-CvImage img_blur(CvImage image);
+cv::Mat img_blur(const cv::Mat &image, int sigma);
+cv::Mat img_blur(const cv::Mat &image);
 
 #endif /* IMG_H_ */

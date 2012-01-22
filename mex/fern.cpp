@@ -37,21 +37,22 @@ static const int nBIT = 1; // number of bits per feature
 
 #define sub2idx(row,col,height) ((int) (floor((row)+0.5) + floor((col)+0.5)*(height)))
 
-void iimg(IplImage *in, double *ii, int imH, int imW) {
+void iimg(const cv::Mat &image, double *ii, int imH, int imW) {
+	IplImage iplImg = image;
 
 	double *prev_line = ii;
 	double s;
 
-	unsigned char* p = (unsigned char*) in->imageData;
+	unsigned char* p = (unsigned char*) iplImg.imageData;
 	unsigned char* tRow = p;
 
 	*ii++ = (double) *p;
-	p += in->widthStep;
+	p += iplImg.widthStep;
 
 	for (int x = 1; x < imH; x++) {
 		*ii = *p + *(ii - 1);
 		ii++;
-		p += in->widthStep;
+		p += iplImg.widthStep;
 	}
 
 	for (int y = 1; y < imW; y++) {
@@ -61,27 +62,27 @@ void iimg(IplImage *in, double *ii, int imH, int imW) {
 			s += (double) *p;
 			*ii = s + *prev_line;
 			ii++;
-			p += in->widthStep;
+			p += iplImg.widthStep;
 			prev_line++;
 		}
 	}
 }
 
-void iimg2(IplImage *in, double *ii2, int imH, int imW) {
-
+void iimg2(const cv::Mat &image, double *ii2, int imH, int imW) {
+	IplImage iplImg = image;
 	double *prev_line = ii2;
 	double s;
 
-	unsigned char* p = (unsigned char*) in->imageData;
+	unsigned char* p = (unsigned char*) iplImg.imageData;
 	unsigned char* tRow = p;
 
 	*ii2++ = (double) ((*p) * (*p));
-	p += in->widthStep;
+	p += iplImg.widthStep;
 
 	for (int x = 1; x < imH; x++) {
 		*ii2 = (*p) * (*p) + *(ii2 - 1);
 		ii2++;
-		p += in->widthStep;
+		p += iplImg.widthStep;
 	}
 
 	for (int y = 1; y < imW; y++) {
@@ -91,7 +92,7 @@ void iimg2(IplImage *in, double *ii2, int imH, int imW) {
 			s += (double) ((*p) * (*p));
 			*ii2 = s + *prev_line;
 			ii2++;
-			p += in->widthStep;
+			p += iplImg.widthStep;
 			prev_line++;
 		}
 	}
@@ -191,7 +192,7 @@ Point* create_offsets(FernData &fernData, Eigen::Matrix<double, Eigen::Dynamic, 
 	return offsets;
 }
 
-int measure_tree_offset(FernData &fernData, IplImage* img, int idx_bbox, int idx_tree) {
+static int measure_tree_offset(FernData &fernData, const cv::Mat &img, int idx_bbox, int idx_tree) {
 
 	int index = 0;
 
@@ -202,13 +203,11 @@ int measure_tree_offset(FernData &fernData, IplImage* img, int idx_bbox, int idx
 		index <<= 1;
 		int fp0 = 0;
 		if ((off[0].row + bbox[0].row) < fernData.imgHeight)
-			fp0 = ((uchar*) (img->imageData + img->widthStep * (off[0].row
-					+ bbox[0].row)))[off[0].col + bbox[0].col];
+			fp0 = img.ptr(off[0].row + bbox[0].row)[off[0].col + bbox[0].col];
 
 		int fp1 = 0;
 		if ((off[1].row + bbox[0].row) < fernData.imgHeight)
-			fp1 = ((uchar*) (img->imageData + img->widthStep * (off[1].row
-					+ bbox[0].row)))[off[1].col + bbox[0].col];
+			fp1 = img.ptr(off[1].row + bbox[0].row)[off[1].col + bbox[0].col];
 
 		if (fp0 > fp1) {
 			index |= 1;
@@ -218,7 +217,7 @@ int measure_tree_offset(FernData &fernData, IplImage* img, int idx_bbox, int idx
 	return index;
 }
 
-double measure_bbox_offset(FernData &fernData, IplImage *blur, int idx_bbox, double minVar,
+static double measure_bbox_offset(FernData &fernData, const cv::Mat &blur, int idx_bbox, double minVar,
 		Eigen::Matrix<double, 10, Eigen::Dynamic>& patt) {
 
 	double conf = 0.0;
@@ -241,13 +240,13 @@ double measure_bbox_offset(FernData &fernData, IplImage *blur, int idx_bbox, dou
 /*
  *  Initialization (source, grid, features, scales)
  */
-void fern1(FernData &fernData, IplImage* source,
+void fern1(FernData &fernData, const cv::Mat &source,
 		Eigen::Matrix<double, 6, Eigen::Dynamic> const & grid, Eigen::Matrix<
 				double, 4 * TLD_NFEATURES, TLD_NTREES> const & features, Eigen::Matrix<
 				double, 2, Eigen::Dynamic> const & scales) {
 
-	fernData.imgHeight = source->height;
-	fernData.imgWidth = source->width;
+	fernData.imgHeight = source.rows;
+	fernData.imgWidth = source.cols;
 	fernData.nTrees = features.cols();
 	fernData.nFeat = features.rows() / 4; // feature has 4 values: x1,y1,x2,y2
 	fernData.thrN = 0.5 * fernData.nTrees;

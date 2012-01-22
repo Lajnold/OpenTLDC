@@ -2,21 +2,22 @@
 
 namespace tld {
 
-CvImage ImageSource::getImage() {
+cv::Mat ImageSource::getImage() {
 	return image;
 }
 
-CvImage ImageSource::getGrayImage() {
+cv::Mat ImageSource::getGrayImage() {
 	return gray;
 }
 
 bool ImageSource::nextImage() {
 	image = getNextImage();
-	if(!image)
+	if(image.empty())
 		return false;
 
-	gray = CvImage(image.size(), IPL_DEPTH_8U, 1);
-	cvCvtColor(image, gray, CV_BGR2GRAY);
+	// Create a new matrix so that the previous gray isn't overwritten.
+	gray = cv::Mat();
+	cv::cvtColor(image, gray, CV_BGR2GRAY);
 
 	return true;
 }
@@ -25,31 +26,27 @@ bool ImageSource::nextImage() {
 
 MemoryFeedImageSource::MemoryFeedImageSource() { }
 
-void MemoryFeedImageSource::addImage(CvImage img) {
+void MemoryFeedImageSource::addImage(cv::Mat img) {
 	images.push_back(img);
 }
 
-CvImage MemoryFeedImageSource::getNextImage() {
+cv::Mat MemoryFeedImageSource::getNextImage() {
 	if(images.empty())
-		return CvImage();
+		return cv::Mat();
 
-	CvImage img = images.front();
+	cv::Mat img = images.front();
 	images.pop_front();
 	return img;
 }
 
 
-CvCaptureImageSource::CvCaptureImageSource(CvCapture *source)
+CvCaptureImageSource::CvCaptureImageSource(cv::VideoCapture *source)
 : source(source) { }
 
-CvImage CvCaptureImageSource::getNextImage() {
-	IplImage *raw = cvQueryFrame(source);
-	if(!raw)
-		return CvImage();
-
-	// cvQueryFrame() returns a static buffer. Clone it so that the image
-	// can be freed after usage.
-	return CvImage(cvCloneImage(raw));
+cv::Mat CvCaptureImageSource::getNextImage() {
+	cv::Mat ret;
+	(*source) >> ret;
+	return ret;
 }
 
 } // namespace tld

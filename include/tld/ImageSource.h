@@ -12,19 +12,19 @@ namespace tld {
 class ImageSource {
 public:
 	bool nextImage();
-	CvImage getImage();
-	CvImage getGrayImage();
+	cv::Mat getImage();
+	cv::Mat getGrayImage();
 
 	virtual ~ImageSource() { };
 
 protected:
 	ImageSource() { }
 
-	virtual CvImage getNextImage() = 0;
+	virtual cv::Mat getNextImage() = 0;
 
 private:
-	CvImage image;
-	CvImage gray;
+	cv::Mat image;
+	cv::Mat gray;
 };
 
 
@@ -32,25 +32,25 @@ class MemoryFeedImageSource : public ImageSource {
 public:
 	MemoryFeedImageSource();
 
-	void addImage(CvImage img);
+	void addImage(cv::Mat img);
 
 protected:
-	CvImage getNextImage();
+	cv::Mat getNextImage();
 
 private:
-	std::list<CvImage> images;
+	std::list<cv::Mat> images;
 };
 
 
 class CvCaptureImageSource : public ImageSource {
 public:
-	CvCaptureImageSource(CvCapture *source);
+	CvCaptureImageSource(cv::VideoCapture *source);
 
 protected:
-	CvImage getNextImage();
+	cv::Mat getNextImage();
 
 private:
-	CvCapture *source;
+	cv::VideoCapture *source;
 };
 
 } // namespace tld
