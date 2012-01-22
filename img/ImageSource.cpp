@@ -26,7 +26,7 @@ bool ImageSource::nextImage() {
 
 MemoryFeedImageSource::MemoryFeedImageSource() { }
 
-void MemoryFeedImageSource::addImage(cv::Mat img) {
+void MemoryFeedImageSource::addImage(const cv::Mat &img) {
 	images.push_back(img);
 }
 

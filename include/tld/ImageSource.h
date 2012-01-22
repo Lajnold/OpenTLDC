@@ -32,7 +32,7 @@ class MemoryFeedImageSource : public ImageSource {
 public:
 	MemoryFeedImageSource();
 
-	void addImage(cv::Mat img);
+	void addImage(const cv::Mat &img);
 
 protected:
 	cv::Mat getNextImage();
