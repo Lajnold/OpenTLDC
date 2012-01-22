@@ -40,13 +40,13 @@
 /* Warps image of size w x h, using affine transformation matrix (2x2 part)
  and offset (center of warping) ofsx, ofsy. Result is the region of size
  defined with roi. */
-void warp_image_roi(IplImage* image, int w, int h, Eigen::Matrix3d const & H,
+void warp_image_roi(const cv::Mat &image, int w, int h, Eigen::Matrix3d const & H,
 		double xmin, double xmax, double ymin, double ymax, double fill,
 		double *result) {
 
 	double curx, cury, curz, wx, wy, wz, ox, oy, oz;
-	int x, y, widthStep = image->widthStep;
-	unsigned char *tmp;
+	int x, y, widthStep = image.step;
+	const unsigned char *tmp;
 	double *output = result, i, j, xx, yy;
 	/* precalulate necessary constant with respect to i,j offset
 	 translation, H is column oriented (transposed) */
@@ -83,7 +83,7 @@ void warp_image_roi(IplImage* image, int w, int h, Eigen::Matrix3d const & H,
 				if (y + 1 == h && wy == 1)
 					y--;
 				if ((x + 1) < w && (y + 1) < h) {
-					tmp = (unsigned char*) &image->imageData[y*widthStep+x];
+					tmp = &image.ptr(y)[x];
 					*output++ = (*(tmp) * (1 - wx) + *nextcol(tmp) * wx)
 									* (1 - wy) + (*nextrow(tmp,widthStep) * (1 - wx)
 									+ *nextr_c(tmp,widthStep) * wx) * wy;
@@ -102,8 +102,9 @@ cv::Mat toMat(const double *image, int num_cols, int num_rows) {
 	const double* s_ptr = image;
 
 	for (int i = 0; i < num_rows; i++) {
+		unsigned char *row = result.ptr(i);
 		for (int j = 0; j < num_cols; j++, s_ptr++) {
-			result.ptr(i)[j] = (unsigned char) (*s_ptr);
+			row[j] = (unsigned char) (*s_ptr);
 		}
 	}
 
@@ -123,11 +124,9 @@ cv::Mat warp(const cv::Mat & img, Eigen::Matrix3d const & H, Eigen::Vector4d con
 	ymax = box(3);
 
 	fill = 0;
+
 	result = new double[((int) (xmax - xmin + 1) * (int) (ymax - ymin + 1))];
-	{
-		IplImage iplImg = img;
-		warp_image_roi(&iplImg, w, h, H, xmin, xmax, ymin, ymax, fill, result);
-	}
+	warp_image_roi(img, w, h, H, xmin, xmax, ymin, ymax, fill, result);
 
 	cv::Mat out = toMat(result, (int) (xmax - xmin + 1), (int) (ymax - ymin + 1));
 

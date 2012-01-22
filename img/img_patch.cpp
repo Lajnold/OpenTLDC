@@ -76,7 +76,7 @@ cv::Mat img_patch(const cv::Mat &img, Eigen::Vector4d const & bb, double randomi
 
 	for (int y = 0; y < patch.rows; y++)
 		for (int x = 0; x < patch.cols; x++)
-			((uchar*) (patch.ptr(y)))[x] += noisy(y, x);
+			patch.ptr(y)[x] += noisy(y, x);
 
 	return patch;
 }

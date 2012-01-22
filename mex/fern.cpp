@@ -38,21 +38,20 @@ static const int nBIT = 1; // number of bits per feature
 #define sub2idx(row,col,height) ((int) (floor((row)+0.5) + floor((col)+0.5)*(height)))
 
 void iimg(const cv::Mat &image, double *ii, int imH, int imW) {
-	IplImage iplImg = image;
-
 	double *prev_line = ii;
 	double s;
 
-	unsigned char* p = (unsigned char*) iplImg.imageData;
+	unsigned char* p = image.data;
 	unsigned char* tRow = p;
+	int widthStep = image.step;
 
 	*ii++ = (double) *p;
-	p += iplImg.widthStep;
+	p += widthStep;
 
 	for (int x = 1; x < imH; x++) {
 		*ii = *p + *(ii - 1);
 		ii++;
-		p += iplImg.widthStep;
+		p += widthStep;
 	}
 
 	for (int y = 1; y < imW; y++) {
@@ -62,27 +61,27 @@ void iimg(const cv::Mat &image, double *ii, int imH, int imW) {
 			s += (double) *p;
 			*ii = s + *prev_line;
 			ii++;
-			p += iplImg.widthStep;
+			p += widthStep;
 			prev_line++;
 		}
 	}
 }
 
 void iimg2(const cv::Mat &image, double *ii2, int imH, int imW) {
-	IplImage iplImg = image;
 	double *prev_line = ii2;
 	double s;
+	int widthStep = image.step;
 
-	unsigned char* p = (unsigned char*) iplImg.imageData;
+	unsigned char* p = image.data;
 	unsigned char* tRow = p;
 
 	*ii2++ = (double) ((*p) * (*p));
-	p += iplImg.widthStep;
+	p += widthStep;
 
 	for (int x = 1; x < imH; x++) {
 		*ii2 = (*p) * (*p) + *(ii2 - 1);
 		ii2++;
-		p += iplImg.widthStep;
+		p += widthStep;
 	}
 
 	for (int y = 1; y < imW; y++) {
@@ -92,7 +91,7 @@ void iimg2(const cv::Mat &image, double *ii2, int imH, int imW) {
 			s += (double) ((*p) * (*p));
 			*ii2 = s + *prev_line;
 			ii2++;
-			p += iplImg.widthStep;
+			p += widthStep;
 			prev_line++;
 		}
 	}

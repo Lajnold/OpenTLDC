@@ -115,11 +115,11 @@ static void embedPex(cv::Mat img, TldStruct& tld) {
 	int pW = pex.cols();
 
 	// include in output image
-	for (int y = 0; y < pH; y++)
+	for (int y = 0; y < pH; y++) {
 		for (int x = img.cols - pW; x < img.cols; x++) {
-			((uchar*) (img.ptr(y)))[x] = 255 * pex(y, x - (img.cols - pW));
-
+			img.ptr(y)[x] = 255 * pex(y, x - (img.cols - pW));
 		}
+	}
 }
 
 /**
@@ -150,10 +150,11 @@ static void embedNex(cv::Mat img, TldStruct& tld) {
 	int pW = nex.cols();
 
 	// include in output image
-	for (int y = 0; y < pH; y++)
+	for (int y = 0; y < pH; y++) {
 		for (int x = 0; x < pW; x++) {
-			((uchar*) (img.ptr(y)))[x] = 255 * nex(y, x);
+			img.ptr(y)[x] = 255 * nex(y, x);
 		}
+	}
 }
 
 /**
@@ -322,10 +323,11 @@ void tldDisplay(int i, unsigned long index, TldStruct& tld, double fps) {
 
 			cv::resize(patch, dest, cv::Size((int) size, (int) size));
 
-			for (unsigned int y = 0; y < size; y++)
+			for (unsigned int y = 0; y < size; y++) {
 				for (unsigned int x = 0; x < size; x++) {
-					((uchar*) (tld.handle.ptr(y)))[x] = ((uchar*) (dest.ptr(y)))[x];
+					tld.handle.ptr(y)[x] = dest.ptr(y)[x];
 				}
+			}
 		}
 
 		// Replace
@@ -347,11 +349,13 @@ void tldDisplay(int i, unsigned long index, TldStruct& tld, double fps) {
 				cv::Mat patch;
 				cv::resize(tld.target, patch, cv::Size(width, height));
 
-				for (unsigned int y = bb(1); y <= bb(3); y++)
+				for (unsigned int y = bb(1); y <= bb(3); y++) {
+					unsigned char *handlerow = tld.handle.ptr(y);
+					unsigned char *patchrow = patch.ptr(y - int(bb(1)));
 					for (unsigned int x = bb(0); x <= bb(2); x++) {
-						((uchar*) (tld.handle.ptr(y)))[x]
-								= ((uchar*) (patch.ptr(y - int(bb(1)))))[x - int(bb(0))];
+						handlerow[x] = patchrow[x - int(bb(0))];
 					}
+				}
 			}
 		}
 
@@ -804,8 +808,6 @@ Vector4d tldGeneratePositiveData(TldStruct& tld,
 
 	// warp blur image to duplicate
 	for (unsigned int i = 0; i < p_par.num_warps; i++) {
-
-
 		if (i > 0) {
 			double randomize = uniform();
 
@@ -813,11 +815,13 @@ Vector4d tldGeneratePositiveData(TldStruct& tld,
 			cv::Mat patch_blur = img_patch(img.blur, bbH, randomize, p_par);
 
 			// include in in image
-			for (unsigned int y = bbH(1); y <= bbH(3); y++)
+			for (unsigned int y = bbH(1); y <= bbH(3); y++) {
+				unsigned char *destrow = im1.blur.ptr(y);
+				unsigned char *srcrow = patch_blur.ptr(y - int(bbH(1)));
 				for (unsigned int x = bbH(0); x <= bbH(2); x++) {
-					((uchar*) (im1.blur.ptr(y)))[x]
-							= ((uchar*) (patch_blur.ptr(y - int(bbH(1)))))[x - int(bbH(0))];
+					destrow[x] = srcrow[x - int(bbH(0))];
 				}
+			}
 		}
 
 		// Measures on blured image
@@ -1052,9 +1056,11 @@ Matrix<double, TLD_PATCHSIZE * TLD_PATCHSIZE, 1> tldPatch2Pattern(const cv::Mat 
 	//bilinear' is faster
 	cv::resize(patch, dest, cv::Size((int) patchsize.x, (int) patchsize.y));
 	MatrixXd pattern(patchsize.x * patchsize.y, 1);
-	for (int x = 0; x < dest.cols; x++)
-		for (int y = 0; y < dest.rows; y++)
-			pattern(x*patchsize.x + y, 0) = double(((uchar*) (dest.ptr(y)))[x]);
+	for (int y = 0; y < dest.rows; y++) {
+		for (int x = 0; x < dest.cols; x++) {
+			pattern(y*patchsize.y + x, 0) = (double) dest.ptr(y)[x];
+		}
+	}
 
 	// calculate column-wise mean
 	RowVectorXd mean(patchsize.x);
