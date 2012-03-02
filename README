@@ -6,6 +6,8 @@ OpenTLDC is an algorithm for tracking of unknown objects in unconstrained video 
 It is based on TLD, published by Zdenek Kalal. 
 It does not depend on any training data, it learns and detects objects in real time.
 
+This package includes a shared library and a stand-alone application.
+
 ================
 License
 ================
@@ -20,14 +22,24 @@ Installing
 - OpenCV 2.1 (http://opencv.willowgarage.com/wiki/)
 - Eigen 3.0.2 (http://eigen.tuxfamily.org/index.php?title=Main_Page)
 
-2.) Modify Makefile
-- Edit paths to eigen3 and OpenCV libraries in line 2:
-	INCLUDES := -OPENCVPATH -EIGEN3PATH
+2.) CMake is used for compilation. Building can take the form:
+  cd path/to/tldc
+  mkdir build
+  cd build
+  cmake ..
+  make
 
-3.) make
+3.) To install:
+  [sudo] make install
+
+  To set a different install prefix, change the 'cmake ..' step to:
+
+    cmake -DCMAKE_INSTALL_PREFIX=/your/prefix/ ..
+
+  and then make install.
 
 ================
-Usage
+Usage (stand-alone application)
 ================
 
 tldc [args]
